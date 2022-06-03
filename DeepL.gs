@@ -91,13 +91,14 @@ function httpRequest_(method, relative_url, formData = null) {
     };
     if (formData) options.payload = formData;
     const response = UrlFetchApp.fetch(url, options);
+    let jsonContent = null;
     try {
-        const jsonContent = JSON.parse(response.getContentText());
-        const responseCode = response.getResponseCode();
-        if (responseCode === 200) return jsonContent;
-        const message = jsonContent.message || '';
-        throw new Error('Error occurred while accessing the DeepL API: HTTP ' + responseCode + ' ' + message);
+        jsonContent = JSON.parse(response.getContentText());
     } catch (error) {
-        throw new Error('Error occurred: while parsing response: ' + response.getContentText());
+        throw new Error('Error occurred while parsing response: ' + response.getContentText());
     }
+    const responseCode = response.getResponseCode();
+    if (responseCode === 200) return jsonContent;
+    const message = jsonContent.message || '';
+    throw new Error('Error occurred while accessing the DeepL API: HTTP ' + responseCode + ' ' + message);
 }
