@@ -32,7 +32,7 @@ function DeepLTranslate(input, source_lang, target_lang, glossary_id) {
 
 /**
  * Retrieve information about your DeepL API usage during the current billing period.
- * @param {"count" or "limit"} type Optional, retrieve the current used amount ("count")
+ * @param {"count", "limit"} type Optional, retrieve the current used amount ("count")
  *   or the maximum allowed amount ("limit").
  * @return String explaining usage, or count or limit values as specified by type argument.
  * @customfunction
