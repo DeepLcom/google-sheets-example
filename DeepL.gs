@@ -16,6 +16,14 @@ const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your 
  * @customfunction
  */
 function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
+    // Check the current cell to detect recalculations due to reopening the sheet
+    const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
+
+    if (cell.getDisplayValue() !== "" && cell.getDisplayValue() !== "Loading...") {
+        Logger.log("Detected cell-recalculation, skipping DeepL translation request");
+        return cell.getDisplayValue();
+    }
+
     if (!targetLang) targetLang = selectDefaultTargetLang_();
     let formData = {
         'target_lang': targetLang,
