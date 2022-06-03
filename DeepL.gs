@@ -1,5 +1,6 @@
 /* Please change the line below */
 const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
+const freeze = false; // Set to true to prevent cell-recalculation
 
 /**
  * Translates from one language to another using the DeepL Translation API.
@@ -16,6 +17,11 @@ const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your 
  * @customfunction
  */
 function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
+    if (freeze) {
+        Logger.log("freeze is active, skipping DeepL translation request");
+        return cell.getDisplayValue();
+    }
+
     // Check the current cell to detect recalculations due to reopening the sheet
     const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
