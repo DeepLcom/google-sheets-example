@@ -27,7 +27,10 @@ function DeepLTranslate(input, source_lang, target_lang, glossary_id) {
     if (glossary_id) {
         formData['glossary_id'] = glossary_id;
     }
-    return httpRequest_('post', '/v2/translate', formData).translations[0].text;
+    const response = httpRequestWithRetries_('post', '/v2/translate', formData);
+    checkResponse_(response);
+    const responseObject = JSON.parse(response.getContentText());
+    return responseObject.translations[0].text;
 }
 
 /**
@@ -38,9 +41,11 @@ function DeepLTranslate(input, source_lang, target_lang, glossary_id) {
  * @customfunction
  */
 function DeepLUsage(type) {
-    const json = httpRequest_('get', '/v2/usage');
-    const charCount = json.character_count;
-    const charLimit = json.character_limit;
+    const response = httpRequestWithRetries_('get', '/v2/usage');
+    checkResponse_(response);
+    const responseObject = JSON.parse(response.getContentText());
+    const charCount = responseObject.character_count;
+    const charLimit = responseObject.character_limit;
     if (charCount === undefined || charLimit === undefined)
         throw new Error('Character usage not found.');
     if (type) {
@@ -75,9 +80,51 @@ function selectDefaultTargetLang_() {
 }
 
 /**
- * Helper function to execute HTTP requests.
+ * Helper function to check response code and if not, throw useful exceptions.
  */
-function httpRequest_(method, relative_url, formData = null) {
+function checkResponse_(response) {
+    const responseCode = response.getResponseCode();
+    if (200 <= responseCode && responseCode < 400) return;
+
+    const content = response.getContentText();
+
+    let message = '';
+    try {
+        const jsonObj = JSON.parse(content);
+        if (jsonObj.message !== undefined) {
+            message += `, message: ${jsonObj.message}`;
+        }
+        if (jsonObj.detail !== undefined) {
+            message += `, detail: ${jsonObj.detail}`;
+        }
+    } catch (error) {
+        // JSON parsing errors are ignored, and we fall back to the raw content
+        message = ', ' + content;
+    }
+
+    switch (responseCode) {
+        case 403:
+            throw new Error(`Authorization failure, check auth_key${message}`);
+        case 456:
+            throw new Error(`Quota for this billing period has been exceeded${message}`);
+        case 400:
+            throw new Error(`Bad request${message}`);
+        case 429:
+            throw new Error(
+                `Too many requests, DeepL servers are currently experiencing high load${message}`,
+            );
+        default: {
+            throw new Error(
+                `Unexpected status code: ${responseCode} ${message}, content: ${content}`,
+            );
+        }
+    }
+}
+
+/**
+ * Helper function to execute HTTP requests and retry failed requests.
+ */
+function httpRequestWithRetries_(method, relative_url, formData = null) {
     const baseUrl = auth_key.endsWith(':fx')
         ? 'https://api-free.deepl.com'
         : 'https://api.deepl.com';
@@ -90,15 +137,32 @@ function httpRequest_(method, relative_url, formData = null) {
         },
     };
     if (formData) options.payload = formData;
-    const response = UrlFetchApp.fetch(url, options);
-    let jsonContent = null;
-    try {
-        jsonContent = JSON.parse(response.getContentText());
-    } catch (error) {
-        throw new Error('Error occurred while parsing response: ' + response.getContentText());
+    let response = null;
+    for (let numRetries = 0; numRetries < 5; numRetries++) {
+        const lastRequestTime = Date.now();
+        try {
+            response = UrlFetchApp.fetch(url, options);
+            const responseCode = response.getResponseCode();
+            if (responseCode !== 429 && responseCode < 500) {
+                return response;
+            }
+        } catch (e) {
+            // It would be sensible to check whether the exception is retryable here, but there is
+            // not so much documentation on Google Apps Script exceptions. In addition, UrlFetchApp
+            // fetch timeouts are very long and not configurable.
+            throw e;
+        }
+        sleepForBackoff(numRetries, lastRequestTime);
     }
-    const responseCode = response.getResponseCode();
-    if (responseCode === 200) return jsonContent;
-    const message = jsonContent.message || '';
-    throw new Error('Error occurred while accessing the DeepL API: HTTP ' + responseCode + ' ' + message);
+    return response;
+}
+
+/**
+ * Helper function to sleep after failed requests.
+ */
+function sleepForBackoff(numRetries, lastRequestTime) {
+    const backoff = Math.min(1000 * (1.6 ** numRetries), 60000);
+    const jitter = 1 + 0.23 * (2 * Math.random() - 1); // Random value in [0.77 1.23]
+    const sleepTime = Date.now() - lastRequestTime + backoff * jitter;
+    Utilities.sleep(sleepTime);
 }
