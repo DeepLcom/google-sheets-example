@@ -27,7 +27,7 @@ function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
     if (glossaryId) {
         formData['glossary_id'] = glossaryId;
     }
-    const response = httpRequestWithRetries_('post', '/v2/translate', formData);
+    const response = httpRequestWithRetries_('post', '/v2/translate', formData, input.length);
     checkResponse_(response);
     const responseObject = JSON.parse(response.getContentText());
     return responseObject.translations[0].text;
@@ -124,7 +124,7 @@ function checkResponse_(response) {
 /**
  * Helper function to execute HTTP requests and retry failed requests.
  */
-function httpRequestWithRetries_(method, relativeUrl, formData = null) {
+function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount = 0) {
     const baseUrl = authKey.endsWith(':fx')
         ? 'https://api-free.deepl.com'
         : 'https://api.deepl.com';
@@ -141,6 +141,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null) {
     for (let numRetries = 0; numRetries < 5; numRetries++) {
         const lastRequestTime = Date.now();
         try {
+            Logger.log(`Sending HTTP request to ${url} with ${charCount} characters`);
             response = UrlFetchApp.fetch(url, params);
             const responseCode = response.getResponseCode();
             if (responseCode !== 429 && responseCode < 500) {
@@ -152,6 +153,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null) {
             // fetch timeouts are very long and not configurable.
             throw e;
         }
+        Logger.log(`Retrying after ${numRetries} failed requests.`);
         sleepForBackoff(numRetries, lastRequestTime);
     }
     return response;
