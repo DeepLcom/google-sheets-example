@@ -79,9 +79,9 @@ function selectDefaultTargetLang_() {
         'it', 'ja', 'lt', 'lv', 'nl', 'pl', 'pt-br', 'pt-pt', 'ro', 'ru', 'sk', 'sl', 'sv',
         'tr', 'zh'];
     const locale = Session.getActiveUserLocale().replace('_', '-').toLowerCase();
-    if (targetLangs.findIndex(locale) !== -1) return locale;
+    if (targetLangs.indexOf(locale) !== -1) return locale;
     const localePrefix = locale.substring(0, 2);
-    if (targetLangs.findIndex(localePrefix) !== -1) return localePrefix;
+    if (targetLangs.indexOf(localePrefix) !== -1) return localePrefix;
     if (localePrefix === 'en') return 'en-US';
     if (localePrefix === 'pt') return 'en-PT';
     return 'en';
