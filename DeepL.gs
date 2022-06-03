@@ -1,5 +1,5 @@
 /* Please change the line below */
-const auth_key = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
+const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
 
 /**
  * Translates from one language to another using the DeepL Translation API.
@@ -7,25 +7,25 @@ const auth_key = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your
  * Note that you need to set your DeepL auth key by calling DeepLAuthKey() before use.
  *
  * @param {"Hello"} input The text to translate.
- * @param {"en"} source_lang Optional. The language code of the source language.
+ * @param {"en"} sourceLang Optional. The language code of the source language.
  *   Use "auto" to auto-detect the language.
- * @param {"es"} target_lang The language code of the target language.
- * @param {"def3a26b-3e84-..."} glossary_id Optional. The ID of a glossary to use
+ * @param {"es"} targetLang The language code of the target language.
+ * @param {"def3a26b-3e84-..."} glossaryId Optional. The ID of a glossary to use
  *   for the translation.
  * @return Translated text.
  * @customfunction
  */
-function DeepLTranslate(input, source_lang, target_lang, glossary_id) {
-    if (!target_lang) target_lang = selectDefaultTargetLang_();
+function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
+    if (!targetLang) targetLang = selectDefaultTargetLang_();
     let formData = {
-        'target_lang': target_lang,
+        'target_lang': targetLang,
         'text': input
     };
-    if (source_lang && source_lang !== 'auto') {
-        formData['source_lang'] = source_lang;
+    if (sourceLang && sourceLang !== 'auto') {
+        formData['source_lang'] = sourceLang;
     }
-    if (glossary_id) {
-        formData['glossary_id'] = glossary_id;
+    if (glossaryId) {
+        formData['glossary_id'] = glossaryId;
     }
     const response = httpRequestWithRetries_('post', '/v2/translate', formData);
     checkResponse_(response);
@@ -66,14 +66,14 @@ function DeepLUsage(type) {
  * @throws Error If the system language could not be converted to a supported target language.
  */
 function selectDefaultTargetLang_() {
-    const target_langs = [
+    const targetLangs = [
         'bg', 'cs', 'da', 'de', 'el', 'en-gb', 'en-us', 'es', 'et', 'fi', 'fr', 'hu', 'id',
         'it', 'ja', 'lt', 'lv', 'nl', 'pl', 'pt-br', 'pt-pt', 'ro', 'ru', 'sk', 'sl', 'sv',
         'tr', 'zh'];
     const locale = Session.getActiveUserLocale().replace('_', '-').toLowerCase();
-    if (target_langs.findIndex(locale) !== -1) return locale;
+    if (targetLangs.findIndex(locale) !== -1) return locale;
     const localePrefix = locale.substring(0, 2);
-    if (target_langs.findIndex(localePrefix) !== -1) return localePrefix;
+    if (targetLangs.findIndex(localePrefix) !== -1) return localePrefix;
     if (localePrefix === 'en') return 'en-US';
     if (localePrefix === 'pt') return 'en-PT';
     return 'en';
@@ -104,7 +104,7 @@ function checkResponse_(response) {
 
     switch (responseCode) {
         case 403:
-            throw new Error(`Authorization failure, check auth_key${message}`);
+            throw new Error(`Authorization failure, check authKey${message}`);
         case 456:
             throw new Error(`Quota for this billing period has been exceeded${message}`);
         case 400:
@@ -124,24 +124,24 @@ function checkResponse_(response) {
 /**
  * Helper function to execute HTTP requests and retry failed requests.
  */
-function httpRequestWithRetries_(method, relative_url, formData = null) {
-    const baseUrl = auth_key.endsWith(':fx')
+function httpRequestWithRetries_(method, relativeUrl, formData = null) {
+    const baseUrl = authKey.endsWith(':fx')
         ? 'https://api-free.deepl.com'
         : 'https://api.deepl.com';
-    const url = baseUrl + relative_url;
-    const options = {
+    const url = baseUrl + relativeUrl;
+    const params = {
         method: method,
         muteHttpExceptions: true,
         headers: {
-            'Authorization': 'DeepL-Auth-Key ' + auth_key,
+            'Authorization': 'DeepL-Auth-Key ' + authKey,
         },
     };
-    if (formData) options.payload = formData;
+    if (formData) params.payload = formData;
     let response = null;
     for (let numRetries = 0; numRetries < 5; numRetries++) {
         const lastRequestTime = Date.now();
         try {
-            response = UrlFetchApp.fetch(url, options);
+            response = UrlFetchApp.fetch(url, params);
             const responseCode = response.getResponseCode();
             if (responseCode !== 429 && responseCode < 500) {
                 return response;
