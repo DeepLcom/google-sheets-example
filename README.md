@@ -54,8 +54,8 @@ eally quickly—and maybe translate more than you intended.
 
 In the Setup Guide and Tutorial below, we include guidelines on:
 
-* [Setting up Cost Control in your DeepL account (applies to Pro API accounts only)](#cost-control-section)
-* [Copy and pasting values so that you don't accidentally "re-translate" content (and consume API characters that will be counted against your usage) every time you open up a Google Sheet that uses the add-on](#paste-special-section)
+* Setting up Cost Control in your DeepL account (applies to Pro API accounts only) ([Jump to section](#cost-control-section))
+* Copy and pasting values so that you don't accidentally "re-translate" content (and consume API characters that will be counted against your usage) every time you open up a Google Sheet that uses the add-on ([Jump to section](#paste-special-section))
 
 __Please review these guidelines if you plan to use the add-on!__ We don't want anyone 
 unintentionally translating more than they'd planned.
@@ -217,13 +217,13 @@ only". You can also use the keyboard shortcut shown in this menu.
 
 Congrats! You've reached the end of this tutorial. Happy translating!
 
-[api-languages]: https://www.deepl.com/docs-api/translating-text/
+[api-languages]: https://www.deepl.com/docs-api/translating-text?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme
 
 [deepl-gs]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
 
 [issues]: https://github.com/DeepLcom/google-sheets-example/issues
 
-[pro-account]: https://www.deepl.com/pro?utm_source=github&utm_medium=google-sheets-plugin-readme#developer
+[pro-account]: https://www.deepl.com/pro?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme#developer
 
 [cost-control]: https://support.deepl.com/hc/en-us/articles/360020685580-Cost-control
 
