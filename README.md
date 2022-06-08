@@ -120,7 +120,7 @@ __between the quotation marks (" ") on line 2 of the Code.gs file.__
 
 Line 2 of the Code.gs file should look something like this:
 ```javascript
-const auth_key = "abcd123-ab12-111-2222-a1a1a1a1a123abc:fx"; // Replace with your authentication key
+const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
 ```
 
 __Rename your Apps Script project__
