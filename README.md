@@ -5,6 +5,9 @@ example projects for the DeepL API. We think this is a great idea! This Google
 Sheets example is the first such code sample that we've released, and we hope it
 can serve as inspiration or help you as you work through your own project.
 
+**Disclaimer**: the DeepL support team does *not* provide support for this
+example. Please keep this in mind when you're deciding whether to use it.
+
 The plugin is open source under the MIT License.
 
 Instructions for getting started are below. If you have any questions or
@@ -23,15 +26,6 @@ can translate up to 500,000 characters/month for free.
 
 You'll also need a Google account so that you can create a Google Sheet then set
 up and use the plugin.
-
-## Support Disclaimer
-
-The DeepL support team does *not* provide support for this plugin. Please keep
-this in mind when you're deciding whether or not to use the plugin.
-
-If you have a question, issue, or feedback related to the plugin, we welcome you
-to [create an issue][issues] in GitHub. We'll respond to GitHub issues on a
-"best effort" basis.
 
 ## Cost Control and API Consumption Disclaimer
 
