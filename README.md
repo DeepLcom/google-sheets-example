@@ -50,7 +50,7 @@ Ideas are welcome!
 
 We also know that in Google Sheets, because a formula can be copied and pasted 
 with just a few keystrokes, it can be easy to translate a lot of characters 
-eally quickly—and maybe translate more than you intended.
+really quickly—and maybe translate more than you intended.
 
 In the Setup Guide and Tutorial below, we include guidelines on:
 
