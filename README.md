@@ -211,7 +211,7 @@ __If you'd like to avoid re-translating (and using API characters) every time__
 __you open this sheet, copy and paste the values of cells B1 and B2.__ <a name="paste-special-section"></a>
 
 After copying cells B1 and B2, go to "Paste special", then click on "Values
-only". You can also use the keyboard shortcut shown in this menu.
+only". You can also use the keyboard shortcut applicable to your operating system.
 
 ![Using Paste special -> Values only](docs/Google_Paste_Values.png)
 
