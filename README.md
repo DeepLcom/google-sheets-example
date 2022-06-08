@@ -8,8 +8,6 @@ can serve as inspiration or help you as you work through your own project.
 **Disclaimer**: the DeepL support team does *not* provide support for this
 example. Please keep this in mind when you're deciding whether to use it.
 
-The plugin is open source under the MIT License.
-
 Instructions for getting started are below. If you have any questions or
 comments, please [create a GitHub issue][issues] to let us know. We'd be happy
 to hear your feedback.
