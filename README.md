@@ -39,10 +39,28 @@ While DeepL's Free API accounts allow you to translate up to 500,000 characters
 per month for free, our Pro API accounts include a monthly base price +
 pay-as-you-go usage pricing. [You can see pricing details here][pro-account].
 
-In the Setup Guide and Tutorial below, we include a couple of best practices on
-setting up Cost Control in your DeepL account and ensuring you that you don't
-accidentally "re-translate" content (and use API characters that you'd be billed
-for) every time you open up a Google Sheet that uses the add-on.
+__Important note:__ there's a known issue with the add-on where re-opening an existing 
+Sheet that contains DeepL API add-on formulas will "re-translate" all cells, and these 
+re-translations will count against your API character consumption.
+
+We've attempted a couple of workarounds here (trying to "detect" when cells have 
+already been translated, adding a flag a user can set in the script to disable 
+formulas altogether), but we haven't yet figured out an ideal solution. 
+Ideas are welcome!
+
+We also know that in Google Sheets, because a formula can be copied and pasted 
+with just a few keystrokes, it can be easy to translate a lot of characters 
+eally quickly—and maybe translate more than you intended.
+
+In the Setup Guide and Tutorial below, we include guidelines on:
+
+* (Setting up Cost Control in your DeepL account (applies to Pro API accounts only))[#cost-control-section]
+* (Copy and pasting values so that you don't accidentally "re-translate" content 
+(and consume API characters that will be counted against your usage) every time 
+you open up a Google Sheet that uses the add-on)[#paste-special-section]
+
+__Please review these guidelines if you plan to use the add-on!__ We don't want anyone 
+unintentionally translating more than they'd planned.
 
 ## Setup Guide
 
@@ -91,6 +109,14 @@ Copy your authentication key.
 
 ![Copy your authentication key](docs/DeepL_Authentication_Key.png)
 
+__Pro API subscribers only: activate Cost Control (optional)__ <a name="cost-control-section"></a>
+
+Free API subscribers can skip this step.
+
+[Instructions for activating cost control are available in the DeepL help center.](cost-control)
+
+If you're a Pro API subscriber, we recommend setting a cost control limit if you have a firm monthly budget for your DeepL API usage. 
+
 __Go back to the Apps Script tab. Paste your DeepL API authentication key in__
 __between the quotation marks (" ") on line 2 of the Code.gs file.__
 
@@ -120,8 +146,8 @@ The example includes two functions: `DeepLTranslate` and `DeepLUsage`.
 Each function has "pop-up" documentation that you'll see when you start typing
 it into a cell in your sheet.
 
-![Popup documentation for DeepLTranslate function](docs/DeepL_Translate_Popup.png)
-![Popup documentation for DeepLUsage function](docs/DeepL_Usage_Popup.png)
+![Popup documentation for DeepLTranslate function](docs/DeepL_Translate_Popup_Full.png)
+![Popup documentation for DeepLUsage function](docs/DeepL_Usage_Popup_Full.png)
 
 Note that you cannot create glossaries using this Google Sheets add-on. You can
 only reference glossary IDs of glossaries that were already created with the
@@ -184,7 +210,7 @@ into B2.
 ![Translating the second cell](docs/DeepL_Function_Call_2.png)
 
 __If you'd like to avoid re-translating (and using API characters) every time__
-__you open this sheet, copy and paste the values of cells B1 and B2.__
+__you open this sheet, copy and paste the values of cells B1 and B2.__ <a name="paste-special-section"></a>
 
 After copying cells B1 and B2, go to "Paste special", then click on "Values
 only". You can also use the keyboard shortcut shown in this menu.
@@ -200,3 +226,6 @@ Congrats! You've reached the end of this tutorial. Happy translating!
 [issues]: https://github.com/DeepLcom/google-sheets-example/issues
 
 [pro-account]: https://www.deepl.com/pro?utm_source=github&utm_medium=google-sheets-plugin-readme#developer
+
+[cost-control]: https://support.deepl.com/hc/en-us/articles/360020685580-Cost-control
+
