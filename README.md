@@ -54,10 +54,8 @@ eally quickly—and maybe translate more than you intended.
 
 In the Setup Guide and Tutorial below, we include guidelines on:
 
-* (Setting up Cost Control in your DeepL account (applies to Pro API accounts only))[#cost-control-section]
-* (Copy and pasting values so that you don't accidentally "re-translate" content 
-(and consume API characters that will be counted against your usage) every time 
-you open up a Google Sheet that uses the add-on)[#paste-special-section]
+* [Setting up Cost Control in your DeepL account (applies to Pro API accounts only)](#cost-control-section)
+* [Copy and pasting values so that you don't accidentally "re-translate" content (and consume API characters that will be counted against your usage) every time you open up a Google Sheet that uses the add-on](#paste-special-section)
 
 __Please review these guidelines if you plan to use the add-on!__ We don't want anyone 
 unintentionally translating more than they'd planned.
@@ -113,7 +111,7 @@ __Pro API subscribers only: activate Cost Control (optional)__ <a name="cost-con
 
 Free API subscribers can skip this step.
 
-[Instructions for activating cost control are available in the DeepL help center.](cost-control)
+[Instructions for activating cost control are available in the DeepL help center][cost-control]. 
 
 If you're a Pro API subscriber, we recommend setting a cost control limit if you have a firm monthly budget for your DeepL API usage. 
 
