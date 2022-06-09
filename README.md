@@ -1,12 +1,12 @@
 # DeepL API - Google Sheets Example
 
-In the past few months, we've heard a lot of requests for code samples or
+In the past few months, we've gotten a lot of requests for code samples or
 example projects for the DeepL API. We think this is a great idea! This Google
 Sheets example is the first such code sample that we've released, and we hope it
 can serve as inspiration or help you as you work through your own project.
 
 **Disclaimer**: the DeepL support team does *not* provide support for this
-example. Please keep this in mind when you're deciding whether to use it.
+example project. Please keep this in mind when deciding whether to use it.
 
 Instructions for getting started are below. If you have any questions or
 comments, please [create a GitHub issue][issues] to let us know. We'd be happy
@@ -22,8 +22,7 @@ can translate up to 500,000 characters/month for free.
 
 ### Google Account
 
-You'll also need a Google account so that you can create a Google Sheet then set
-up and use the plugin.
+You'll also need a Google account to use Google Sheets.
 
 ## Cost Control and API Consumption Disclaimer
 
@@ -31,41 +30,52 @@ While DeepL's Free API accounts allow you to translate up to 500,000 characters
 per month for free, our Pro API accounts include a monthly base price +
 pay-as-you-go usage pricing. [You can see pricing details here][pro-account].
 
-__Important note:__ there's a known issue with the add-on where re-opening an existing 
-Sheet that contains DeepL API add-on formulas will "re-translate" all cells, and these 
-re-translations will count against your API character consumption.
+**Important note:** there's a known issue with the add-on where re-opening an
+existing Sheet that contains DeepL API add-on formulas will "re-translate" all
+cells, and these re-translations will count against your API character
+consumption.
 
-We've attempted a couple of workarounds here (trying to "detect" when cells have 
-already been translated, adding a flag a user can set in the script to disable 
-formulas altogether), but we haven't yet figured out an ideal solution. 
-Ideas are welcome!
+We've built a couple of workarounds into the script (trying to "detect" when
+cells have already been translated, adding a flag a user can set in the script
+to disable re-translation altogether), but we haven't yet figured out an ideal
+solution. Ideas are welcome!
 
 We also know that in Google Sheets, because a formula can be copied and pasted 
 with just a few keystrokes, it can be easy to translate a lot of characters 
-really quickly—and maybe translate more than you intended.
+very quickly — and maybe translate more than you intended.
 
-In the Setup Guide and Tutorial below, we include guidelines on:
+In the [Re-translation Workarounds](#re-translation-workarounds) section below,
+we explain some methods to avoid this.
 
-* Setting up Cost Control in your DeepL account (applies to Pro API accounts only) ([Jump to section](#cost-control-section))
-* Copy and pasting values so that you don't accidentally "re-translate" content (and consume API characters that will be counted against your usage) every time you open up a Google Sheet that uses the add-on ([Jump to section](#paste-special-section))
+**Please review these guidelines** if you plan to use the add-on! We don't want
+anyone to unintentionally translate more than they'd planned.
 
-__Please review these guidelines if you plan to use the add-on!__ We don't want anyone 
-unintentionally translating more than they'd planned.
+## Setup
 
-## Setup Guide
+1. In your Google Sheet, from the "Extensions" menu select "Apps Script" to open
+   the Apps Script editor.
+2. Create a script file named `DeepL.gs` and copy the contents of the
+   [DeepL.gs](DeepL.gs) file in this repo into it.
+3. Modify line 2 of the script to include your DeepL Authentication Key.
+4. Close the Apps Script editor and return to your sheet.
+5. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
+   [Usage](#usage).
+
+You should review the [Re-translation Workarounds](#re-translation-workarounds)
+to avoid translating more than you intend.
+
+### Setup tutorial
 
 These instructions were written so that non-developers can also use the add-on
-🙂
+🙂.
 
 This guide walks you through setup using a new, blank Google Sheet. But you can
 also use the add-on with an existing Sheet (including if that Sheet already has
 App Scripts). In the case of a sheet that already has App Scripts, you'd simply
-need to add a new App Script file (e.g. named "DeepL.gs") and add the code
+need to add a new Apps Script file (e.g. named "DeepL.gs") and add the code
 provided below.
 
-__Create a new Google Sheet.__
-
-In the top toolbar, click on "Extensions" then "Apps Script".
+__Create a new Google Sheet. In the top toolbar, click on "Extensions" then "Apps Script".__
   
 ![Extensions menu -> App Script button](docs/Select_Extensions_AppScript.png)
 
@@ -80,8 +90,8 @@ __section on the Apps Script tab is completely empty.__
 
 Replace the "Code.gs" section in the Apps Script tab with the contents of the 
 "DeepL.gs" file in this git repository.
-[Click here][deepl-gs] to get the raw contents from GitHub, and copy and paste
-the contents into the Apps Script tab.
+[Click here][deepl-gs-raw] to get the raw contents from GitHub, and copy and
+paste the contents into the Apps Script tab.
 
 __Go to deepl.com and sign in to your DeepL API account__
 
@@ -99,20 +109,12 @@ Copy your authentication key.
 
 ![Copy your authentication key](docs/DeepL_Authentication_Key.png)
 
-__Pro API subscribers only: activate Cost Control (optional)__ <a name="cost-control-section"></a>
-
-Free API subscribers can skip this step.
-
-[Instructions for activating cost control are available in the DeepL help center][cost-control]. 
-
-If you're a Pro API subscriber, we recommend setting a cost control limit if you have a firm monthly budget for your DeepL API usage. 
-
 __Go back to the Apps Script tab. Paste your DeepL API authentication key in__
 __between the quotation marks (" ") on line 2 of the Code.gs file.__
 
 Line 2 of the Code.gs file should look something like this:
 ```javascript
-const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
+const authKey = "ab7be987-af47-8776-815f-0fad93fe87b8:fx"; // Replace with your authentication key
 ```
 
 __Rename your Apps Script project__
@@ -129,7 +131,7 @@ __Click on the "Save" icon in the Apps Script toolbar__
 You can now close the Apps Script tab and navigate back to the Sheet you created
 at the start of setup. Let's get translating!
 
-## Usage Guide
+## Usage
 
 The example includes two functions: `DeepLTranslate` and `DeepLUsage`.
 
@@ -162,7 +164,7 @@ DeepLTranslate("Guten Tag", "auto", "FR")
     106691
 ```
 
-## A Quick Tutorial
+### Usage Tutorial
 
 Type some sample source text into cells A1 and A2.
 
@@ -199,21 +201,65 @@ into B2.
 
 ![Translating the second cell](docs/DeepL_Function_Call_2.png)
 
-__If you'd like to avoid re-translating (and using API characters) every time__
-__you open this sheet, copy and paste the values of cells B1 and B2.__ <a name="paste-special-section"></a>
+Congrats! You've reached the end of this tutorial. Happy translating!
 
-After copying cells B1 and B2, go to "Paste special", then click on "Values
-only". You can also use the keyboard shortcut applicable to your operating system.
+## Re-translation Workarounds
+
+### Set up Cost Control
+
+DeepL API Pro subscribers can activate Cost Control in their account. 
+[Instructions for activating cost control are available in the DeepL help center][cost-control].
+
+If you're a DeepL API Pro subscriber, we recommend setting a cost control limit
+if you have a firm monthly budget for your DeepL API usage.
+
+Cost Control is not available to DeepL API Free users; they are limited to
+500,000 characters per month.
+
+### Copy-Paste "Values only"
+
+After you have used the `DeepLTranslate` function to get a translation in a
+cell, you can use this workaround to "freeze" the result, so that it will not
+be re-translated.
+
+Copy the cell you want to freeze, then use "Paste special", "Values only" on
+the same cell. You can also do this with multiple cells in a range.
+
+For example, after translating into cells B1 and B2, we can freeze their results.
+Copying cells B1 and B2, then in the "Edit" menu, go to "Paste special", then
+click on "Values only".
+You can also use the keyboard shortcut applicable to your operating system.
 
 ![Using Paste special -> Values only](docs/Google_Paste_Values.png)
 
-Congrats! You've reached the end of this tutorial. Happy translating!
+### Script `freeze` Flag
+
+At the top of the provided script ([DeepL.gs](DeepL.gs)), there is a `freeze`
+flag to disable all translations. If you set the flag to `true` and save the
+script, the `DeepLTranslate` function will be disabled and already-translated
+cells will not be re-translated.
+
+### Built-in re-calculation detection
+
+Finally, automatic re-calculation detection is built-in to the script, however
+unfortunately tests have shown the detection technique used is not fully
+reliable.
+
+## Contributing feedback and improvements
+
+We welcome your feedback and questions about the project. Please feel free 
+to [create a GitHub issue][issues] to get in touch with us.
+
+If you'd like to contribute to the project, please open a [pull request][pull-requests]. 
+Our contributing guidelines apply to all contributions. 
 
 [api-languages]: https://www.deepl.com/docs-api/translating-text?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme
 
-[deepl-gs]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
+[deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
 
 [issues]: https://github.com/DeepLcom/google-sheets-example/issues
+
+[pull-requests]: https://github.com/DeepLcom/google-sheets-example/issues
 
 [pro-account]: https://www.deepl.com/pro?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme#developer
 
