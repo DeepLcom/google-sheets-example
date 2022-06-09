@@ -17,13 +17,13 @@ const freeze = false; // Set to true to prevent cell-recalculation
  * @customfunction
  */
 function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
+    // Check the current cell to detect recalculations due to reopening the sheet
+    const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
+
     if (freeze) {
         Logger.log("freeze is active, skipping DeepL translation request");
         return cell.getDisplayValue();
     }
-
-    // Check the current cell to detect recalculations due to reopening the sheet
-    const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
     if (cell.getDisplayValue() !== "" && cell.getDisplayValue() !== "Loading...") {
         Logger.log("Detected cell-recalculation, skipping DeepL translation request");
