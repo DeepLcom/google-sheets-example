@@ -10,7 +10,8 @@ const freeze = false; // Set to true to prevent cell-recalculation
  * @param {"Hello"} input The text to translate.
  * @param {"en"} sourceLang Optional. The language code of the source language.
  *   Use "auto" to auto-detect the language.
- * @param {"es"} targetLang The language code of the target language.
+ * @param {"es"} targetLang Optional. The language code of the target language.
+ *   If unspecified, defaults to your system language.
  * @param {"def3a26b-3e84-..."} glossaryId Optional. The ID of a glossary to use
  *   for the translation.
  * @return Translated text.
