@@ -67,7 +67,7 @@ function DeepLUsage(type) {
         if (type === 'limit') return charLimit;
         throw new Error('Unrecognized type argument.');
     }
-    return charCount + ' of ' + charLimit + ' characters used.';
+    return `${charCount} of ${charLimit} characters used.`;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
