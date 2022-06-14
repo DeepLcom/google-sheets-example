@@ -1,6 +1,10 @@
 /* Please change the line below */
 const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
-const freeze = false; // Set to true to prevent cell-recalculation
+
+/* Change the line below to stop cells from re-translating */
+const freeze = false; // Set to true to stop re-translation
+
+/* You shouldn't need to modify the lines below here */
 
 /**
  * Translates from one language to another using the DeepL Translation API.
@@ -95,7 +99,7 @@ function selectDefaultTargetLang_() {
 }
 
 /**
- * Helper function to check response code and if not, throw useful exceptions.
+ * Helper function to check response code is OK and if not, throw useful exceptions.
  */
 function checkResponse_(response) {
     const responseCode = response.getResponseCode();
