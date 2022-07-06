@@ -22,7 +22,9 @@ can translate up to 500,000 characters/month for free.
 
 ### Google Account
 
-You'll also need a Google account to use Google Sheets.
+You'll also need a Google account to use Google Sheets. Please ensure you comply
+with all applicable terms of service when using third-party products such as
+Google Sheets.
 
 ## Cost Control and API Consumption Disclaimer
 
@@ -56,7 +58,8 @@ anyone to unintentionally translate more than they'd planned.
    the Apps Script editor.
 2. Create a script file named `DeepL.gs` and copy the contents of the
    [DeepL.gs](DeepL.gs) file in this repo into it.
-3. Modify line 2 of the script to include your DeepL Authentication Key.
+3. Modify line 26 of the script to include your DeepL Authentication Key. This 
+   line looks like `const authKey = "..";`, and it follows the license text. 
 4. Close the Apps Script editor and return to your sheet.
 5. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
    [Usage](#usage).
@@ -110,9 +113,9 @@ Copy your authentication key.
 ![Copy your authentication key](docs/DeepL_Authentication_Key.png)
 
 __Go back to the Apps Script tab. Paste your DeepL API authentication key in__
-__between the quotation marks (" ") on line 2 of the Code.gs file.__
+__between the quotation marks (" ") on line 26 of the Code.gs file.__
 
-Line 2 of the Code.gs file should look something like this:
+Line 26 of the Code.gs file should look something like this:
 ```javascript
 const authKey = "ab7be987-af47-8776-815f-0fad93fe87b8:fx"; // Replace with your authentication key
 ```
