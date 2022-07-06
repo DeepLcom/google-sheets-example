@@ -22,7 +22,9 @@ can translate up to 500,000 characters/month for free.
 
 ### Google Account
 
-You'll also need a Google account to use Google Sheets.
+You'll also need a Google account to use Google Sheets. Please ensure you comply
+with all applicable terms of service when using third-party products such as
+Google Sheets.
 
 ## Cost Control and API Consumption Disclaimer
 
