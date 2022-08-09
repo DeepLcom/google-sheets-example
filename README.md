@@ -57,9 +57,9 @@ anyone to unintentionally translate more than they'd planned.
 1. In your Google Sheet, from the "Extensions" menu select "Apps Script" to open
    the Apps Script editor.
 2. Create a script file named `DeepL.gs` and copy the contents of the
-   [DeepL.gs](DeepL.gs) file in this repo into it.
+   [DeepL.gs][deepl-gs-raw] file in this repo into it.
 3. Modify line 26 of the script to include your DeepL Authentication Key. This 
-   line looks like `const authKey = "..";`, and it follows the license text. 
+   line looks like `const authKey = "..";`, and it comes after the license text. 
 4. Close the Apps Script editor and return to your sheet.
 5. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
    [Usage](#usage).
