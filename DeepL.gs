@@ -28,6 +28,9 @@ const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your 
 /* Change the line below to disable all translations. */
 const disableTranslations = false; // Set to true to stop translations.
 
+/* Change the line below to activate auto-detection of re-translations. */
+const activateAutoDetect = false; // Set to true to enable auto-detection of re-translation.
+
 /* You shouldn't need to modify the lines below here */
 
 /**
@@ -54,7 +57,9 @@ function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
         return cell.getDisplayValue();
     }
 
-    if (cell.getDisplayValue() !== "" && cell.getDisplayValue() !== "Loading...") {
+    if (activateAutoDetect &&
+            cell.getDisplayValue() !== "" &&
+            cell.getDisplayValue() !== "Loading...") {
         Logger.log("Detected cell-recalculation, skipping DeepL translation request");
         return cell.getDisplayValue();
     }

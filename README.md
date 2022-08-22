@@ -242,11 +242,15 @@ At the top of the provided script ([DeepL.gs](DeepL.gs)), there is a
 `true` and save the script, the `DeepLTranslate` function will be disabled and
 already-translated cells will not be re-translated.
 
-### Built-in re-calculation detection
+### Built-in re-translation detection
 
-Finally, automatic re-calculation detection is built-in to the script, however
-unfortunately tests have shown the detection technique used is not fully
-reliable.
+Automatic re-translation detection is built-in to the script, however it is
+disabled by default because unfortunately tests have shown the detection
+technique used is not fully reliable.
+
+There is an `activateAutoDetect` variable at the top of the provided script
+([DeepL.gs](DeepL.gs)) to activate the automatic re-translation detection. Set
+it to `true` to enable this feature.
 
 ## Contributing feedback and improvements
 
