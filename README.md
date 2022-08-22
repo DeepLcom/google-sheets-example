@@ -235,12 +235,12 @@ You can also use the keyboard shortcut applicable to your operating system.
 
 ![Using Paste special -> Values only](docs/Google_Paste_Values.png)
 
-### Script `freeze` Flag
+### Script `disableTranslations` Flag
 
-At the top of the provided script ([DeepL.gs](DeepL.gs)), there is a `freeze`
-flag to disable all translations. If you set the flag to `true` and save the
-script, the `DeepLTranslate` function will be disabled and already-translated
-cells will not be re-translated.
+At the top of the provided script ([DeepL.gs](DeepL.gs)), there is a
+`disableTranslations` variable to disable all translations. If you set it to
+`true` and save the script, the `DeepLTranslate` function will be disabled and
+already-translated cells will not be re-translated.
 
 ### Built-in re-calculation detection
 

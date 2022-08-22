@@ -25,8 +25,8 @@ SOFTWARE.
 /* Please change the line below */
 const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
 
-/* Change the line below to stop cells from re-translating */
-const freeze = false; // Set to true to stop re-translation
+/* Change the line below to disable all translations. */
+const disableTranslations = false; // Set to true to stop translations.
 
 /* You shouldn't need to modify the lines below here */
 
@@ -49,8 +49,8 @@ function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
     // Check the current cell to detect recalculations due to reopening the sheet
     const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
-    if (freeze) {
-        Logger.log("freeze is active, skipping DeepL translation request");
+    if (disableTranslations) {
+        Logger.log("disableTranslations is active, skipping DeepL translation request");
         return cell.getDisplayValue();
     }
 
