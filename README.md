@@ -229,7 +229,7 @@ options absolute (`$C$2:$D$4`).
 
 #### Inline formula options
 
-Google Sheets also allows you to specify ranges in a formula using the
+You can also pass the options to the DeepLTranslate function directly using the
 `{opt1, val1; opt2, val2; ..}` syntax, for example:
 
 ```=DeepLTranslate(A1,,"de",,{"tag_handling", "xml"; "ignore_tags", "ignore,a,b,c"})```
