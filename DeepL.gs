@@ -56,6 +56,13 @@ function DeepLTranslate(input,
                         glossaryId,
                         options
 ) {
+    if (input === undefined) {
+        throw new Error("input field is undefined, please specify the text to translate.");
+    } else if (typeof input === "number") {
+        input = input.toString();
+    } else if (typeof input !== "string") {
+        throw new Error("input text must be a string.");
+    }
     // Check the current cell to detect recalculations due to reopening the sheet
     const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
