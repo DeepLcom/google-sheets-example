@@ -221,7 +221,7 @@ in the following example:
 
 ![Translating the second cell](docs/DeepL_Function_Call_Additional_Options.png)
 
-Note that the `source_lang` and `glossary_id` parameters are used in this
+Note that the `source_lang` and `glossary_id` parameters are not used in this
 example, so they are empty.
 
 If you are translating multiple cells, you may want to make the reference to the
