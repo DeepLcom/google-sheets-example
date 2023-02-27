@@ -45,10 +45,17 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
  *   If unspecified, defaults to your system language.
  * @param {"def3a26b-3e84-..."} glossaryId Optional. The ID of a glossary to use
  *   for the translation.
+ * @param {cell range} options Optional. Range of additional options to send with API translation
+ *   request. May also be specified inline e.g. '{"tag_handling", "xml"; "ignore_tags", "ignore"}'
  * @return Translated text.
  * @customfunction
  */
-function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
+function DeepLTranslate(input,
+                        sourceLang,
+                        targetLang,
+                        glossaryId,
+                        options
+) {
     if (input === undefined) {
         throw new Error("input field is undefined, please specify the text to translate.");
     } else if (typeof input === "number") {
@@ -82,6 +89,22 @@ function DeepLTranslate(input, sourceLang, targetLang, glossaryId) {
     if (glossaryId) {
         formData['glossary_id'] = glossaryId;
     }
+    if (options) {
+        if (!Array.isArray(options) ||
+            !Object.values(options).every(function(value) {
+                return Array.isArray(value) && value.length === 2;
+            })) {
+            throw new Error("options must be a range with two columns, or have the form '{\"opt1\", \"val1\"; \"opt2\", \"val2\"}'");
+        }
+
+        for (let i = 0; i < options.length; i++) {
+            const items = options[i];
+            const key = items[0];
+            const value = items[1];
+            formData[key] = value;
+        }
+    }
+
     const response = httpRequestWithRetries_('post', '/v2/translate', formData, input.length);
     checkResponse_(response);
     const responseObject = JSON.parse(response.getContentText());

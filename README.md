@@ -206,6 +206,34 @@ into B2.
 
 Congrats! You've reached the end of this tutorial. Happy translating!
 
+### Additional options
+
+The `DeepLTranslate()` function allows you to specify additional DeepL API
+options to include in your translation requests. This allows you to specify tag
+handling options, sentence-splitting, and so on. 
+
+The fifth argument to `DeepLTranslate()` accepts the options specified as a
+range with two columns: the option name and option values. You can specify the 
+options somewhere in the sheet and refer to them in your translations, as shown
+in the following example:
+
+```=DeepLTranslate(A1,,"de",,C2:D4)```
+
+![Translating the second cell](docs/DeepL_Function_Call_Additional_Options.png)
+
+Note that the `source_lang` and `glossary_id` parameters are not used in this
+example, so they are empty.
+
+If you are translating multiple cells, you may want to make the reference to the
+options absolute (`$C$2:$D$4`).
+
+#### Inline formula options
+
+You can also pass the options to the DeepLTranslate function directly using the
+`{opt1, val1; opt2, val2; ..}` syntax, for example:
+
+```=DeepLTranslate(A1,,"de",,{"tag_handling", "xml"; "ignore_tags", "ignore,a,b,c"})```
+
 ## Re-translation Workarounds
 
 ### Set up Cost Control
