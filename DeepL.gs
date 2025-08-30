@@ -100,8 +100,7 @@ function DeepLTranslate(input,
         for (let i = 0; i < options.length; i++) {
             const items = options[i];
             const key = items[0];
-            const value = items[1];
-            formData[key] = value;
+            formData[key] = items[1];
         }
     }
 
