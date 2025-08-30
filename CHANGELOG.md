@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Renamed `freeze` variable to `disableTranslations`.
 * Re-translation auto-detection is now off by default, and can be activated by
   `activateAutoDetect` variable.
+* Moved `DEEPL_API_KEY` to script properties, for ease of use. Additionally,
+  including the API key directly into the script is not very secure.
 
 
 ## [0.1.0] - 2022-07-06

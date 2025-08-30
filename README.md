@@ -56,12 +56,15 @@ anyone to unintentionally translate more than they'd planned.
 
 1. In your Google Sheet, from the "Extensions" menu select "Apps Script" to open
    the Apps Script editor.
-2. Create a script file named `DeepL.gs` and copy the contents of the
-   [DeepL.gs][deepl-gs-raw] file in this repo into it.
-3. Modify line 26 of the script to include your DeepL Authentication Key. This 
-   line looks like `const authKey = "..";`, and it comes after the license text. 
-4. Close the Apps Script editor and return to your sheet.
-5. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
+2. Create a script file named `DeepL.gs`, copy the contents of the
+   [DeepL.gs][deepl-gs-raw] file in this repo into it, and save the script file.
+   Note you do not need to modify the file. 
+3. Open the Project settings (the gear icon in the left panel) and scroll down to
+   the "Script properties" section.
+4. Edit the script properties to add a new property `DEEPL_API_KEY` with the value
+   containing your DeepL API authentication key, and save the script properties.
+5. Close the Apps Script settings and return to your sheet.
+6. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
    [Usage](#usage).
 
 You should review the [Re-translation Workarounds](#re-translation-workarounds)
@@ -112,13 +115,13 @@ Copy your authentication key.
 
 ![Copy your authentication key](docs/DeepL_Authentication_Key.png)
 
-__Go back to the Apps Script tab. Paste your DeepL API authentication key in__
-__between the quotation marks (" ") on line 26 of the Code.gs file.__
+__Go back to the Apps Script tab. Open the project settings (the gear icon in
+the left panel) and scroll down to the "Script properties" section.__ 
 
-Line 26 of the Code.gs file should look something like this:
-```javascript
-const authKey = "ab7be987-af47-8776-815f-0fad93fe87b8:fx"; // Replace with your authentication key
-```
+![Set script properties](docs/Google_Set_ScriptProperties.png)
+
+Edit the script properties to add a new property named `DEEPL_API_KEY` and paste
+the copied DeepL API key into the value box. Then click `Save script properties`.
 
 __Rename your Apps Script project__
 
@@ -262,6 +265,11 @@ click on "Values only".
 You can also use the keyboard shortcut applicable to your operating system.
 
 ![Using Paste special -> Values only](docs/Google_Paste_Values.png)
+
+### Remove DeepL API key from script properties
+
+To eliminate the possibility of re-translating cells, you can remove the
+DeepL API key from the script properties.
 
 ### Script `disableTranslations` Flag
 
