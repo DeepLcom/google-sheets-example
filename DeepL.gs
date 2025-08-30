@@ -32,6 +32,9 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
 
 const deeplApiKey = PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
 
+/* Version of this script from https://github.com/DeepLcom/google-sheet-example, included in logs. */
+const scriptVersion = "0.1.0";
+
 /**
  * Translates from one language to another using the DeepL Translation API.
  *
@@ -64,14 +67,14 @@ function DeepLTranslate(input,
     const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
     if (disableTranslations) {
-        Logger.log("disableTranslations is active, skipping DeepL translation request");
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: disableTranslations is active, skipping DeepL translation request`);
         return cell.getDisplayValue();
     }
 
     if (activateAutoDetect &&
             cell.getDisplayValue() !== "" &&
             cell.getDisplayValue() !== "Loading...") {
-        Logger.log("Detected cell-recalculation, skipping DeepL translation request");
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Detected cell-recalculation, skipping DeepL translation request`);
         return cell.getDisplayValue();
     }
 
@@ -216,7 +219,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
     for (let numRetries = 0; numRetries < 5; numRetries++) {
         const lastRequestTime = Date.now();
         try {
-            Logger.log(`Sending HTTP request to ${url} with ${charCount} characters`);
+            Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Sending HTTP request to ${url} with ${charCount} characters`);
             response = UrlFetchApp.fetch(url, params);
             const responseCode = response.getResponseCode();
             if (responseCode !== 429 && responseCode < 500) {
@@ -228,7 +231,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
             // fetch timeouts are very long and not configurable.
             throw e;
         }
-        Logger.log(`Retrying after ${numRetries} failed requests.`);
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Retrying after ${numRetries} failed requests.`);
         sleepForBackoff(numRetries, lastRequestTime);
     }
     return response;
