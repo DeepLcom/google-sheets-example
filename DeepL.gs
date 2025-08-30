@@ -33,7 +33,7 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
 const deeplApiKey = PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
 
 /* Version of this script from https://github.com/DeepLcom/google-sheet-example, included in logs. */
-const scriptVersion = "0.1.0";
+const scriptVersion = "0.2.0";
 
 /**
  * Translates from one language to another using the DeepL Translation API.
