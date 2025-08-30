@@ -35,8 +35,6 @@ const deeplApiKey = PropertiesService.getScriptProperties().getProperty('DEEPL_A
 /**
  * Translates from one language to another using the DeepL Translation API.
  *
- * Note that you need to set your DeepL auth key by calling DeepLAuthKey() before use.
- *
  * @param {"Hello"} input The text to translate.
  * @param {"en"} sourceLang Optional. The language code of the source language.
  *   Use "auto" to auto-detect the language.
