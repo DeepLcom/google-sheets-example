@@ -105,15 +105,17 @@ If you don't yet have a DeepL API account, [please create one here][pro-account]
 
 ![Login to DeepL API account](docs/DeepL_API_Login.png)
 
-__Go to the Account tab in your API account__
+__Go to the API keys & limits tab in your API account__
 
-![DeepL Account tab](docs/DeepL_Account_Tab.png)
+![DeepL API key tab](docs/DeepL_API_Key_Tab.png)
 
-__Scroll down to find your authentication key.__
+__Click on `Create key` to generate a new key.__
 
-Copy your authentication key.
+Name your key to note that this key is for Google Sheets translation.
 
-![Copy your authentication key](docs/DeepL_Authentication_Key.png)
+After the key is created, copy your authentication key.
+
+![Create API key](docs/DeepL_Create_API_Key.png)
 
 __Go back to the Apps Script tab. Open the project settings (the gear icon in
 the left panel) and scroll down to the "Script properties" section.__ 
