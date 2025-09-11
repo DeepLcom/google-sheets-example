@@ -22,9 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-/* Please change the line below */
-const authKey = "b493b8ef-0176-215d-82fe-e28f182c9544:fx"; // Replace with your authentication key
-
 /* Change the line below to disable all translations. */
 const disableTranslations = false; // Set to true to stop translations.
 
@@ -33,10 +30,13 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
 
 /* You shouldn't need to modify the lines below here */
 
+const deeplApiKey = PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
+
+/* Version of this script from https://github.com/DeepLcom/google-sheet-example, included in logs. */
+const scriptVersion = "0.2.0";
+
 /**
  * Translates from one language to another using the DeepL Translation API.
- *
- * Note that you need to set your DeepL auth key by calling DeepLAuthKey() before use.
  *
  * @param {"Hello"} input The text to translate.
  * @param {"en"} sourceLang Optional. The language code of the source language.
@@ -67,14 +67,14 @@ function DeepLTranslate(input,
     const cell = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getCurrentCell();
 
     if (disableTranslations) {
-        Logger.log("disableTranslations is active, skipping DeepL translation request");
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: disableTranslations is active, skipping DeepL translation request`);
         return cell.getDisplayValue();
     }
 
     if (activateAutoDetect &&
             cell.getDisplayValue() !== "" &&
             cell.getDisplayValue() !== "Loading...") {
-        Logger.log("Detected cell-recalculation, skipping DeepL translation request");
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Detected cell-recalculation, skipping DeepL translation request`);
         return cell.getDisplayValue();
     }
 
@@ -100,8 +100,7 @@ function DeepLTranslate(input,
         for (let i = 0; i < options.length; i++) {
             const items = options[i];
             const key = items[0];
-            const value = items[1];
-            formData[key] = value;
+            formData[key] = items[1];
         }
     }
 
@@ -182,7 +181,7 @@ function checkResponse_(response) {
 
     switch (responseCode) {
         case 403:
-            throw new Error(`Authorization failure, check authKey${message}`);
+            throw new Error(`Authorization failure, check DeepL API key, ${message}`);
         case 456:
             throw new Error(`Quota for this billing period has been exceeded${message}`);
         case 400:
@@ -203,7 +202,7 @@ function checkResponse_(response) {
  * Helper function to execute HTTP requests and retry failed requests.
  */
 function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount = 0) {
-    const baseUrl = authKey.endsWith(':fx')
+    const baseUrl = deeplApiKey.endsWith(':fx')
         ? 'https://api-free.deepl.com'
         : 'https://api.deepl.com';
     const url = baseUrl + relativeUrl;
@@ -211,7 +210,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
         method: method,
         muteHttpExceptions: true,
         headers: {
-            'Authorization': 'DeepL-Auth-Key ' + authKey,
+            'Authorization': 'DeepL-Auth-Key ' + deeplApiKey,
         },
     };
     if (formData) params.payload = formData;
@@ -219,7 +218,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
     for (let numRetries = 0; numRetries < 5; numRetries++) {
         const lastRequestTime = Date.now();
         try {
-            Logger.log(`Sending HTTP request to ${url} with ${charCount} characters`);
+            Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Sending HTTP request to ${url} with ${charCount} characters`);
             response = UrlFetchApp.fetch(url, params);
             const responseCode = response.getResponseCode();
             if (responseCode !== 429 && responseCode < 500) {
@@ -231,7 +230,7 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
             // fetch timeouts are very long and not configurable.
             throw e;
         }
-        Logger.log(`Retrying after ${numRetries} failed requests.`);
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: Retrying after ${numRetries} failed requests.`);
         sleepForBackoff(numRetries, lastRequestTime);
     }
     return response;

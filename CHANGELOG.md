@@ -6,15 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+## [0.2.0] - 2025-09-01
 ### Changed
 * Renamed `freeze` variable to `disableTranslations`.
 * Re-translation auto-detection is now off by default, and can be activated by
   `activateAutoDetect` variable.
+* Moved `DEEPL_API_KEY` to script properties, for ease of use. Additionally,
+  including the API key directly into the script is not very secure.
 
 
 ## [0.1.0] - 2022-07-06
 Initial release.
 
 
-[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/DeepLcom/google-sheets-example/releases/tag/v0.1.0
