@@ -1,306 +1,104 @@
-# DeepL API - Google Sheets Example
+# DeepL API - Google Sheets Example (Sidebar UI)
 
-In the past few months, we've gotten a lot of requests for code samples or
-example projects for the DeepL API. We think this is a great idea! This Google
-Sheets example is the first such code sample that we've released, and we hope it
-can serve as inspiration or help you as you work through your own project.
+This branch adds a **sidebar UI** to the Google Sheets DeepL integration. Select
+cells in your sheet, open the DeepL sidebar, choose your translation options, and
+click **Translate** — results are written back as plain text values, so they are
+never re-translated when the sheet is reopened.
 
 **Disclaimer**: the DeepL support team does *not* provide support for this
-example project. Please keep this in mind when deciding whether to use it.
-
-Instructions for getting started are below. If you have any questions or
-comments, please [create a GitHub issue][issues] to let us know. We'd be happy
-to hear your feedback.
+example project. If you have questions or feedback, please
+[open a GitHub issue][issues].
 
 ## Requirements
 
-### DeepL API Authentication Key
-
-To use this plugin, you'll need a DeepL API authentication key. To get a key,
-[please create an account here][pro-account]. With a DeepL API Free account, you
-can translate up to 500,000 characters/month for free.
-
-### Google Account
-
-You'll also need a Google account to use Google Sheets. Please ensure you comply
-with all applicable terms of service when using third-party products such as
-Google Sheets.
-
-## Cost Control and API Consumption Disclaimer
-
-While DeepL's Free API accounts allow you to translate up to 500,000 characters
-per month for free, our Pro API accounts include a monthly base price +
-pay-as-you-go usage pricing. [You can see pricing details here][pro-account].
-
-**Important note:** there's a known issue with the add-on where re-opening an
-existing Sheet that contains DeepL API add-on formulas will "re-translate" all
-cells, and these re-translations will count against your API character
-consumption.
-
-We've built a couple of workarounds into the script (trying to "detect" when
-cells have already been translated, adding a flag a user can set in the script
-to disable re-translation altogether), but we haven't yet figured out an ideal
-solution. Ideas are welcome!
-
-We also know that in Google Sheets, because a formula can be copied and pasted 
-with just a few keystrokes, it can be easy to translate a lot of characters 
-very quickly — and maybe translate more than you intended.
-
-In the [Re-translation Workarounds](#re-translation-workarounds) section below,
-we explain some methods to avoid this.
-
-**Please review these guidelines** if you plan to use the add-on! We don't want
-anyone to unintentionally translate more than they'd planned.
+- A **DeepL API authentication key**. [Create a free account here][pro-account]
+  — the Free tier allows up to 500,000 characters/month.
+- A **Google account** to use Google Sheets.
 
 ## Setup
 
-1. In your Google Sheet, from the "Extensions" menu select "Apps Script" to open
-   the Apps Script editor.
-2. Create a script file named `DeepL.gs`, copy the contents of the
-   [DeepL.gs][deepl-gs-raw] file in this repo into it, and save the script file.
-   Note you do not need to modify the file. 
-3. Open the Project settings (the gear icon in the left panel) and scroll down to
-   the "Script properties" section.
-4. Edit the script properties to add a new property `DEEPL_API_KEY` with the value
-   containing your DeepL API authentication key, and save the script properties.
-5. Close the Apps Script settings and return to your sheet.
-6. Use the `DeepLTranslate` and `DeepLUsage` functions as explained in 
-   [Usage](#usage).
+### Option A — Copy the template sheet (recommended)
 
-You should review the [Re-translation Workarounds](#re-translation-workarounds)
-to avoid translating more than you intend.
+DeepL maintains a ready-to-use template Google Sheet with the script already
+embedded. No coding required.
 
-### Setup tutorial
+1. Open the [DeepL for Google Sheets template][template-sheet] *(link to be
+   added when the template is published)*.
+2. Click **File → Make a copy**. Give it a name and save it to your Drive.
+3. Open your copy and click **DeepL → Open sidebar** in the toolbar.
+4. Enter your DeepL API key when prompted. The sidebar verifies the key and
+   takes you straight to the translation UI.
 
-These instructions were written so that non-developers can also use the add-on
-🙂.
+### Option B — Manual installation
 
-This guide walks you through setup using a new, blank Google Sheet. But you can
-also use the add-on with an existing Sheet (including if that Sheet already has
-App Scripts). In the case of a sheet that already has App Scripts, you'd simply
-need to add a new Apps Script file (e.g. named "DeepL.gs") and add the code
-provided below.
+Use this if you want to add DeepL to an existing sheet, or prefer to install
+from source.
 
-__Create a new Google Sheet. In the top toolbar, click on "Extensions" then "Apps Script".__
-  
-![Extensions menu -> App Script button](docs/Select_Extensions_AppScript.png)
+1. In your Google Sheet, go to **Extensions → Apps Script**.
+2. Click **+** next to "Files", choose **Script**, name it `DeepL` and paste in the contents of
+   [DeepL.gs][deepl-gs-raw].
+3. Add another file, choose **HTML**, name it `DeepLSidebar`, and paste in the contents of
+   [DeepLSidebar.html][deepl-sidebar-html-raw]. **Save the changes**.
+4. Close the Apps Script tab and reload your sheet. A **DeepL** menu will
+   appear in the toolbar.
+5. Click **DeepL → Open sidebar** and enter your API key when prompted.
 
-A new Apps Script tab will open. It should look something like this:
+#### Updating
 
-![Apps Script tab](docs/AppScript_Page_With_Placeholder.png)
-
-__Delete the function myFunction()... placeholder code so that this "Code.gs"__
-__section on the Apps Script tab is completely empty.__
-
-![Deleting the placeholder code](docs/AppScript_Page_Deleted_Placeholder.png)
-
-Replace the "Code.gs" section in the Apps Script tab with the contents of the 
-"DeepL.gs" file in this git repository.
-[Click here][deepl-gs-raw] to get the raw contents from GitHub, and copy and
-paste the contents into the Apps Script tab.
-
-__Go to deepl.com and sign in to your DeepL API account__
-
-If you don't yet have a DeepL API account, [please create one here][pro-account].
-
-![Login to DeepL API account](docs/DeepL_API_Login.png)
-
-__Go to the API keys & limits tab in your API account__
-
-![DeepL API key tab](docs/DeepL_API_Key_Tab.png)
-
-__Click on `Create key` to generate a new key.__
-
-Name your key to note that this key is for Google Sheets translation.
-
-After the key is created, copy your authentication key.
-
-![Create API key](docs/DeepL_Create_API_Key.png)
-
-__Go back to the Apps Script tab. Open the project settings (the gear icon in
-the left panel) and scroll down to the "Script properties" section.__ 
-
-![Set script properties](docs/Google_Set_ScriptProperties.png)
-
-Edit the script properties to add a new property named `DEEPL_API_KEY` and paste
-the copied DeepL API key into the value box. Then click `Save script properties`.
-
-__Rename your Apps Script project__
-
-Click on the "Untitled project" title and give the project a new name. You can
-use any name you like.
-
-![Rename the Apps Script project](docs/AppScript_Rename_Project.png)
-
-__Click on the "Save" icon in the Apps Script toolbar__
-
-![Save the Apps Script project](docs/AppScript_Save_Project.png)
-
-You can now close the Apps Script tab and navigate back to the Sheet you created
-at the start of setup. Let's get translating!
+To check for updates, see the [CHANGELOG][changelog]. To update, open
+**Extensions → Apps Script** and replace the contents of `DeepL.gs` and
+`DeepLSidebar.html` with the latest versions (links above). Save and reload
+your sheet. Your API key and saved options are stored in Script Properties and
+are unaffected by updates.
 
 ## Usage
 
-The example includes two functions: `DeepLTranslate` and `DeepLUsage`.
+1. **Select** one or more cells containing the text you want to translate.
+2. Click **DeepL → Open sidebar**.
+3. Set your options:
 
-Each function has "pop-up" documentation that you'll see when you start typing
-it into a cell in your sheet.
+   | Option | Description |
+   |---|---|
+   | Source language | Language of the input text. Leave as Auto-detect if unsure. |
+   | Target language | Language to translate into. |
+   | Context | Optional hint to help DeepL disambiguate the text (e.g. *"product listing for a luxury watch"*). Not translated. |
+   | Formality | Default / Formal / Informal. Applies to supported languages; a note appears in the sidebar if the selected language ignores this setting. |
+   | Glossary ID | ID of a DeepL glossary to apply. |
 
-![Popup documentation for DeepLTranslate function](docs/DeepL_Translate_Popup_Full.png)
-![Popup documentation for DeepLUsage function](docs/DeepL_Usage_Popup_Full.png)
+4. Click **Translate**. Results are written back as plain text and will not be
+   re-translated when the sheet is reopened.
 
-Note that you cannot create glossaries using this Google Sheets add-on. You can
-only reference glossary IDs of glossaries that were already created with the
-DeepL API.
+All settings are saved and restored automatically between sessions.
 
-In addition, here are some examples that might help you get started.
+The sidebar shows a **usage bar** for the current billing period, updated after
+each translation. Your API key can be replaced or cleared at any time from the
+**Settings** section at the bottom of the sidebar.
 
-```
-=DeepLTranslate("Bonjour!")
-    “Hello!” (or equivalent in your system language)
+The installed version is shown in the sidebar footer and under **DeepL → About**.
 
-DeepLTranslate("Guten Tag", "auto", "FR")
-    “Bonjour”
+## Formula functions
 
-=DeepLTranslate("Hello", "en", "de", "61a74456-b47c-48a2-8271-bbfd5e8152af")
-    “Moin” (translating using a glossary)
+The script still includes the former `DeepLTranslate()` and `DeepLUsage()` spreadsheet
+formula functions, for backward compatibility. These are **disabled by default** — read
+[FORMULA_FUNCTIONS.md][formula-functions] for usage details, cost implications,
+and instructions to enable them.
 
-=DeepLUsage()
-    “106691 of 500000 characters used.”
+## Contributing
 
-=DeepLUsage("count")
-    106691
-```
-
-### Usage Tutorial
-
-Type some sample source text into cells A1 and A2.
-
-I'll use the following sentences:
-* "The weather sure is nice today."
-* "I wonder if it's supposed to rain later this week."
-
-![Example sentences for using DeepL plugin](docs/DeepL_Plugin_Example_Sentences.png)
-
-In cell B1, type `=DeepLTranslate(` to start using the DeepL function we created.
-
-![Typing in the DeepLTranslate formula](docs/DeepL_Translate_Function_Start.png)
-
-We'll use the following parameters:
-* `input`: A1 (cell A1—but you can also type in your own text)
-* `source_lang`: "auto" (DeepL will auto-detect the source language)
-* `target_lang`: "DE" (German—or feel free to select a 2-letter language code of
-  your choice from the [target_lang section on this page][api-languages])
-* `glossary_id`: We'll skip this parameter, as we aren't using a glossary in
-  this example.
-
-The resulting function call will look like this:
-
-```=DeepLTranslate(A1, "auto", "DE")```
-
-Press enter to run the function.
-
-Success! Cell A1 was translated into German.
-
-![Translating the first cell](docs/DeepL_Function_Call_1.png)
-
-To translate our second cell of source text, you can copy cell B1 and paste it
-into B2.
-
-![Translating the second cell](docs/DeepL_Function_Call_2.png)
-
-Congrats! You've reached the end of this tutorial. Happy translating!
-
-### Additional options
-
-The `DeepLTranslate()` function allows you to specify additional DeepL API
-options to include in your translation requests. This allows you to specify tag
-handling options, sentence-splitting, and so on. 
-
-The fifth argument to `DeepLTranslate()` accepts the options specified as a
-range with two columns: the option name and option values. You can specify the 
-options somewhere in the sheet and refer to them in your translations, as shown
-in the following example:
-
-```=DeepLTranslate(A1,,"de",,C2:D4)```
-
-![Translating the second cell](docs/DeepL_Function_Call_Additional_Options.png)
-
-Note that the `source_lang` and `glossary_id` parameters are not used in this
-example, so they are empty.
-
-If you are translating multiple cells, you may want to make the reference to the
-options absolute (`$C$2:$D$4`).
-
-#### Inline formula options
-
-You can also pass the options to the DeepLTranslate function directly using the
-`{opt1, val1; opt2, val2; ..}` syntax, for example:
-
-```=DeepLTranslate(A1,,"de",,{"tag_handling", "xml"; "ignore_tags", "ignore,a,b,c"})```
-
-## Re-translation Workarounds
-
-### Set up Cost Control
-
-DeepL API Pro subscribers can activate Cost Control in their account. 
-[Instructions for activating cost control are available in the DeepL help center][cost-control].
-
-If you're a DeepL API Pro subscriber, we recommend setting a cost control limit
-if you have a firm monthly budget for your DeepL API usage.
-
-Cost Control is not available to DeepL API Free users; they are limited to
-500,000 characters per month.
-
-### Copy-Paste "Values only"
-
-After you have used the `DeepLTranslate` function to get a translation in a
-cell, you can use this workaround to "freeze" the result, so that it will not
-be re-translated.
-
-Copy the cell you want to freeze, then use "Paste special", "Values only" on
-the same cell. You can also do this with multiple cells in a range.
-
-For example, after translating into cells B1 and B2, we can freeze their results.
-Copying cells B1 and B2, then in the "Edit" menu, go to "Paste special", then
-click on "Values only".
-You can also use the keyboard shortcut applicable to your operating system.
-
-![Using Paste special -> Values only](docs/Google_Paste_Values.png)
-
-### Remove DeepL API key from script properties
-
-To eliminate the possibility of re-translating cells, you can remove the
-DeepL API key from the script properties.
-
-### Script `disableTranslations` Flag
-
-At the top of the provided script ([DeepL.gs](DeepL.gs)), there is a
-`disableTranslations` variable to disable all translations. If you set it to
-`true` and save the script, the `DeepLTranslate` function will be disabled and
-already-translated cells will not be re-translated.
-
-### Built-in re-translation detection
-
-Automatic re-translation detection is built-in to the script, however it is
-disabled by default because unfortunately tests have shown the detection
-technique used is not fully reliable.
-
-There is an `activateAutoDetect` variable at the top of the provided script
-([DeepL.gs](DeepL.gs)) to activate the automatic re-translation detection. Set
-it to `true` to enable this feature.
-
-## Contributing feedback and improvements
-
-We welcome your feedback and questions about the project. Please feel free 
-to [create a GitHub issue][issues] to get in touch with us.
-
-If you'd like to contribute to the project, please open a [pull request][pull-requests]. 
-Our contributing guidelines apply to all contributions. 
+We welcome feedback and contributions. Please [open an issue][issues] or
+[submit a pull request][pull-requests].
 
 [api-languages]: https://www.deepl.com/docs-api/translating-text?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme
 
-[deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
+[template-sheet]: https://docs.google.com/spreadsheets/d/1VVMDPYV7oL7ZM51RFUBDmmXnXRjYcMeiPx4gw5zAOgc/edit?usp=sharing
+
+[deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/feat/sidebar-ui-addon/DeepL.gs
+
+[deepl-sidebar-html-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/feat/sidebar-ui-addon/DeepLSidebar.html
+
+[formula-functions]: FORMULA_FUNCTIONS.md
+
+[changelog]: https://github.com/DeepLcom/google-sheets-example/blob/main/CHANGELOG.md
 
 [issues]: https://github.com/DeepLcom/google-sheets-example/issues
 
@@ -309,4 +107,3 @@ Our contributing guidelines apply to all contributions.
 [pro-account]: https://www.deepl.com/pro?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme#developer
 
 [cost-control]: https://support.deepl.com/hc/en-us/articles/360020685580-Cost-control
-
