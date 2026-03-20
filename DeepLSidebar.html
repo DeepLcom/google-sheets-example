@@ -442,8 +442,8 @@
   </div>
 
   <script>
-    // Formality is only applied for these target language tags.
-    var FORMALITY_LANGS = new Set(['de','fr','it','es','nl','pl','pt-BR','pt-PT','ja','ru']);
+    // Formality is only applied for these target language tags (matched case-insensitively).
+    var FORMALITY_LANGS = new Set(['de','fr','it','es','nl','pl','pt-br','pt-pt','ja','ru']);
     var statusTimer = null;
 
     // ── Init ─────────────────────────────────────────────────────────────────
@@ -539,7 +539,7 @@
       var lang = getLangValue('targetLang', 'targetLangCode') || '';
       var note = document.getElementById('formality-note');
       var formality = document.getElementById('formality').value;
-      var supported = FORMALITY_LANGS.has(lang);
+      var supported = FORMALITY_LANGS.has(lang.toLowerCase());
       note.className = 'field-note' + (!supported && formality ? ' visible' : '');
     }
 
@@ -659,6 +659,11 @@
         .slice(0, 10);
       var modelType   = document.getElementById('modelType').value;
       var extraOptions = document.getElementById('extraOptions').value.trim();
+
+      if (!targetLang) {
+        setStatus('translate-status', 'Please enter a target language code.', 'error');
+        return;
+      }
 
       var btn = document.getElementById('translateBtn');
       btn.disabled = true;

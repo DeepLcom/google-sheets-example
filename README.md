@@ -57,13 +57,29 @@ are unaffected by updates.
 2. Click **DeepL → Open sidebar**.
 3. Set your options:
 
+   **Options** (always visible)
+
    | Option | Description |
    |---|---|
-   | Source language | Language of the input text. Leave as Auto-detect if unsure. |
-   | Target language | Language to translate into. |
-   | Context | Optional hint to help DeepL disambiguate the text (e.g. *"product listing for a luxury watch"*). Not translated. |
-   | Formality | Default / Formal / Informal. Applies to supported languages; a note appears in the sidebar if the selected language ignores this setting. |
+   | Source language | Language of the input text. Leave as Auto-detect if unsure. Choose *Other* to enter any BCP-47 code. |
+   | Target language | Language to translate into. Choose *Other* to enter any BCP-47 code. |
+   | Formality | Default / Formal / Informal. A note appears when the target language does not support this setting. |
+   | Context | Optional hint to disambiguate the text (e.g. *"product listing for a luxury watch"*). Not translated. |
+
+   **Customization** (collapsible)
+
+   | Option | Description |
+   |---|---|
    | Glossary ID | ID of a DeepL glossary to apply. |
+   | Style rule ID | ID of a DeepL style rule list to apply. |
+   | Custom instructions | Up to 10 plain-language instructions, one per line (e.g. *"Use gender-neutral language"*). |
+
+   **Advanced** (collapsible)
+
+   | Option | Description |
+   |---|---|
+   | Model | Default, Quality optimized, Prefer quality, or Speed optimized. |
+   | Extra API options | Additional DeepL API parameters as `key=value` lines or a JSON object. |
 
 4. Click **Translate**. Results are written back as plain text and will not be
    re-translated when the sheet is reopened.

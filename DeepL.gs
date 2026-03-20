@@ -178,17 +178,6 @@ function getSavedOptions() {
 }
 
 /**
- * Returns the count of cells in the active selection.
- * Called from the sidebar to show how many cells will be translated.
- * @return {number}
- */
-function getSelectionCount() {
-    const range = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveRange();
-    if (!range) return 0;
-    return range.getNumRows() * range.getNumColumns();
-}
-
-/**
  * Returns the last 4 characters of the saved API key, for display in the sidebar.
  * @return {string|null}
  */
