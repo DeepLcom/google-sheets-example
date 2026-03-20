@@ -246,12 +246,21 @@ function callDeeplTranslateApi_(texts, sourceLang, targetLang, options) {
                                                     body.custom_instructions  = options.customInstructions;
     if (options.modelType)                          body.model_type           = options.modelType;
     if (options.extraOptions) {
-        for (const line of options.extraOptions.split('\n')) {
-            const idx = line.indexOf('=');
-            if (idx > 0) {
-                const key = line.slice(0, idx).trim();
-                const val = line.slice(idx + 1).trim();
-                if (key) body[key] = val;
+        const raw = options.extraOptions.trim();
+        if (raw.startsWith('{')) {
+            let parsed;
+            try { parsed = JSON.parse(raw); } catch (e) {
+                throw new Error('Extra options: invalid JSON — ' + e.message);
+            }
+            Object.assign(body, parsed);
+        } else {
+            for (const line of raw.split('\n')) {
+                const idx = line.indexOf('=');
+                if (idx > 0) {
+                    const key = line.slice(0, idx).trim();
+                    const val = line.slice(idx + 1).trim();
+                    if (key) body[key] = val;
+                }
             }
         }
     }
