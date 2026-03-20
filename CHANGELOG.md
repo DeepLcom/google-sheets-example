@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-03-20
+### Added
+* Style rule ID field in the sidebar (Advanced section).
+* Custom instructions field — up to 10 instructions, one per line.
+* Model selection: Default, Quality optimized, Prefer quality, Speed optimized.
+* All new options are saved and restored automatically between sessions.
+
+### Changed
+* Sidebar options reorganised into collapsible sections: **Options**
+  (formality, context, custom instructions) and **Advanced** (glossary ID,
+  style rule ID, model), keeping the main translation controls uncluttered.
+* All translation options are now passed to the API as a single JSON object.
+
 ## [0.3.0] - 2026-03-17
 ### Added
 * **Sidebar UI for translation**. Select cells, set options, and click
@@ -39,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 
-[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/DeepLcom/google-sheets-example/releases/tag/v0.1.0

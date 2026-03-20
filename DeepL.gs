@@ -35,7 +35,7 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
 /* You shouldn't need to modify the lines below here */
 
 /* Version of this script from https://github.com/DeepLcom/google-sheet-example, included in logs. */
-const scriptVersion = "0.3.0";
+const scriptVersion = "0.4.0";
 
 /**
  * Creates the DeepL menu when the spreadsheet is opened.
