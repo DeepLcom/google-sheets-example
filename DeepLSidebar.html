@@ -51,6 +51,23 @@
     }
     select:focus, input[type="text"]:focus { border-color: #1a73e8; }
 
+    textarea {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #202124;
+      background: #fff;
+      margin-bottom: 4px;
+      outline: none;
+      resize: vertical;
+      min-height: 58px;
+      font-family: 'Google Sans', Arial, sans-serif;
+      line-height: 1.4;
+    }
+    textarea:focus { border-color: #1a73e8; }
+
     /* Password field with show/hide toggle */
     .password-row {
       display: flex;
@@ -94,6 +111,14 @@
     }
     .field-note.visible { display: block; }
 
+    .field-hint {
+      display: block;
+      font-size: 11px;
+      color: #80868b;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
     .btn {
       display: block;
       width: 100%;
@@ -112,7 +137,7 @@
     .btn-secondary:hover { background: #f8f9fa; }
     .btn-secondary:disabled { color: #bdc1c6; border-color: #e8eaed; cursor: default; }
 
-.status {
+    .status {
       padding: 8px 10px;
       border-radius: 4px;
       font-size: 12px;
@@ -157,8 +182,8 @@
       justify-content: space-between;
     }
 
-    /* Settings collapsible */
-    details { margin-top: 4px; }
+    /* Collapsible sections */
+    details { margin-bottom: 4px; }
     details summary {
       list-style: none;
       cursor: pointer;
@@ -181,7 +206,7 @@
       display: inline-block;
     }
     details[open] summary::before { transform: rotate(90deg); }
-    .settings-body { padding-top: 10px; }
+    .section-body { padding-top: 10px; }
 
     .key-info {
       font-size: 12px;
@@ -301,25 +326,55 @@
       <option value="ZH">Chinese (ZH)</option>
     </select>
 
-    <label for="context">Context (optional)</label>
-    <input type="text" id="context" placeholder="e.g. Product description for a luxury watch">
+    <details id="options-section" open>
+      <summary>Options</summary>
+      <div class="section-body">
 
-    <label for="formality">Formality</label>
-    <select id="formality">
-      <option value="">Default</option>
-      <option value="prefer_more">Formal</option>
-      <option value="prefer_less">Informal</option>
-    </select>
-    <span id="formality-note" class="field-note">
-      Formality is not supported for this language and will be ignored.
-    </span>
+        <label for="formality">Formality</label>
+        <select id="formality" onchange="updateFormalityNote()">
+          <option value="">Default</option>
+          <option value="prefer_more">Formal</option>
+          <option value="prefer_less">Informal</option>
+        </select>
+        <span id="formality-note" class="field-note">
+          Formality is not supported for this language and will be ignored.
+        </span>
 
-    <label for="glossaryId">Glossary ID (optional)</label>
-    <input type="text" id="glossaryId" placeholder="e.g. def3a26b-3e84-...">
+        <label for="context">Context (optional)</label>
+        <input type="text" id="context" placeholder="e.g. Product description for a luxury watch">
+
+        <label for="customInstructions">Custom instructions (optional)</label>
+        <textarea id="customInstructions" rows="3"
+          placeholder="One instruction per line&#10;e.g. Use gender-neutral language&#10;e.g. Keep product names untranslated"></textarea>
+        <span class="field-hint">Up to 10 instructions, 300 characters each.</span>
+
+      </div>
+    </details>
+
+    <details id="advanced-section">
+      <summary>Advanced</summary>
+      <div class="section-body">
+
+        <label for="glossaryId">Glossary ID (optional)</label>
+        <input type="text" id="glossaryId" placeholder="e.g. def3a26b-3e84-…">
+
+        <label for="styleId">Style rule ID (optional)</label>
+        <input type="text" id="styleId" placeholder="e.g. def3a26b-3e84-…">
+
+        <label for="modelType">Model</label>
+        <select id="modelType">
+          <option value="">Default</option>
+          <option value="quality_optimized">Quality optimized</option>
+          <option value="prefer_quality_optimized">Prefer quality</option>
+          <option value="latency_optimized">Speed optimized</option>
+        </select>
+
+      </div>
+    </details>
 
     <button class="btn btn-primary" id="translateBtn" onclick="translateSelection()">
       Translate selected cell(s)
-</button>
+    </button>
     <div id="translate-status" class="status"></div>
 
     <hr class="divider">
@@ -339,7 +394,7 @@
 
     <details id="settings-section">
       <summary>Settings</summary>
-      <div class="settings-body">
+      <div class="section-body">
         <div class="key-info">Active key: <code>···<span id="key-suffix">····</span></code></div>
         <label for="update-key">Replace API key</label>
         <div class="password-row">
@@ -394,11 +449,14 @@
     google.script.run
       .withSuccessHandler(function(opts) {
         if (!opts) return;
-        document.getElementById('sourceLang').value = opts.sourceLang;
-        document.getElementById('targetLang').value = opts.targetLang;
-        document.getElementById('context').value    = opts.context;
-        document.getElementById('formality').value  = opts.formality;
-        document.getElementById('glossaryId').value = opts.glossaryId;
+        document.getElementById('sourceLang').value         = opts.sourceLang;
+        document.getElementById('targetLang').value         = opts.targetLang;
+        document.getElementById('formality').value          = opts.formality;
+        document.getElementById('context').value            = opts.context;
+        document.getElementById('customInstructions').value = opts.customInstructions;
+        document.getElementById('glossaryId').value         = opts.glossaryId;
+        document.getElementById('styleId').value            = opts.styleId;
+        document.getElementById('modelType').value          = opts.modelType;
         updateFormalityNote();
       })
       .getSavedOptions();
@@ -423,13 +481,8 @@
       var note = document.getElementById('formality-note');
       var formality = document.getElementById('formality').value;
       var supported = FORMALITY_LANGS.has(lang);
-      // Only show note if a non-default formality is selected AND the lang doesn't support it.
       note.className = 'field-note' + (!supported && formality ? ' visible' : '');
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('formality').addEventListener('change', updateFormalityNote);
-    });
 
     // ── Usage bar ────────────────────────────────────────────────────────────
 
@@ -536,9 +589,17 @@
     function translateSelection() {
       var sourceLang = document.getElementById('sourceLang').value;
       var targetLang = document.getElementById('targetLang').value;
-      var context    = document.getElementById('context').value.trim();
       var formality  = document.getElementById('formality').value;
+      var context    = document.getElementById('context').value.trim();
+      var customInstructions = document.getElementById('customInstructions').value
+        .split('\n')
+        .map(function(s) { return s.trim(); })
+        .filter(function(s) { return s.length > 0; })
+        .slice(0, 10);
       var glossaryId = document.getElementById('glossaryId').value.trim();
+      var styleId    = document.getElementById('styleId').value.trim();
+      var modelType  = document.getElementById('modelType').value;
+
       var btn = document.getElementById('translateBtn');
       btn.disabled = true;
       setStatus('translate-status', 'Translating…', 'info');
@@ -565,10 +626,14 @@
           btn.disabled = false;
           setStatus('translate-status', err.message || String(err), 'error');
         })
-        .translateSelectionFromSidebar(
-          sourceLang || null, targetLang, glossaryId || null,
-          formality || null, context || null
-        );
+        .translateSelectionFromSidebar(sourceLang || null, targetLang, {
+          formality:          formality          || null,
+          context:            context            || null,
+          customInstructions: customInstructions.length ? customInstructions : null,
+          glossaryId:         glossaryId         || null,
+          styleId:            styleId            || null,
+          modelType:          modelType          || null,
+        });
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

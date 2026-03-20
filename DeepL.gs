@@ -87,12 +87,14 @@ function showSidebar() {
  *
  * @param {string|null} sourceLang Source language code, or null for auto-detect.
  * @param {string} targetLang Target language code.
- * @param {string|null} glossaryId Glossary ID, or null to omit.
+ * @param {{glossaryId, formality, context, styleId, customInstructions, modelType}} options
  * @return {{translated: number, skipped: number, failed: number, error: string, billedCharacters: number}}
  */
-function translateSelectionFromSidebar(sourceLang, targetLang, glossaryId, formality, context) {
+function translateSelectionFromSidebar(sourceLang, targetLang, options) {
     const range = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveRange();
     if (!range) throw new Error('No cells selected.');
+
+    options = options || {};
 
     const flatCells = [];
     for (let r = 0; r < range.getNumRows(); r++) {
@@ -102,11 +104,15 @@ function translateSelectionFromSidebar(sourceLang, targetLang, glossaryId, forma
     }
 
     PropertiesService.getScriptProperties().setProperties({
-        'DEEPL_LAST_SOURCE_LANG':  sourceLang  || '',
-        'DEEPL_LAST_TARGET_LANG':  targetLang,
-        'DEEPL_LAST_FORMALITY':    formality   || '',
-        'DEEPL_LAST_CONTEXT':      context     || '',
-        'DEEPL_LAST_GLOSSARY_ID':  glossaryId  || '',
+        'DEEPL_LAST_SOURCE_LANG':         sourceLang                   || '',
+        'DEEPL_LAST_TARGET_LANG':         targetLang,
+        'DEEPL_LAST_FORMALITY':           options.formality            || '',
+        'DEEPL_LAST_CONTEXT':             options.context              || '',
+        'DEEPL_LAST_GLOSSARY_ID':         options.glossaryId           || '',
+        'DEEPL_LAST_STYLE_ID':            options.styleId              || '',
+        'DEEPL_LAST_CUSTOM_INSTRUCTIONS': options.customInstructions
+                                            ? options.customInstructions.join('\n') : '',
+        'DEEPL_LAST_MODEL_TYPE':          options.modelType            || '',
     });
 
     const cellsToTranslate = flatCells.filter(cell => {
@@ -121,7 +127,7 @@ function translateSelectionFromSidebar(sourceLang, targetLang, glossaryId, forma
 
     try {
         const texts = cellsToTranslate.map(cell => cell.getDisplayValue());
-        const results = callDeeplTranslateApi_(texts, sourceLang, targetLang, glossaryId, formality, context);
+        const results = callDeeplTranslateApi_(texts, sourceLang, targetLang, options);
         const billedCharacters = results.reduce((sum, r) => sum + r.billedCharacters, 0);
         for (let i = 0; i < cellsToTranslate.length; i++) {
             cellsToTranslate[i].setValue(results[i].text);
@@ -151,18 +157,21 @@ function getUsageForSidebar() {
 /**
  * Returns all saved sidebar options, or null if none have been saved yet.
  * Called from the sidebar on load.
- * @return {{sourceLang: string, targetLang: string, formality: string, context: string, glossaryId: string}|null}
+ * @return {{sourceLang, targetLang, formality, context, glossaryId, styleId, customInstructions, modelType}|null}
  */
 function getSavedOptions() {
     const props = PropertiesService.getScriptProperties();
     const targetLang = props.getProperty('DEEPL_LAST_TARGET_LANG');
     if (!targetLang) return null;
     return {
-        sourceLang: props.getProperty('DEEPL_LAST_SOURCE_LANG') || '',
+        sourceLang:         props.getProperty('DEEPL_LAST_SOURCE_LANG')          || '',
         targetLang,
-        formality:  props.getProperty('DEEPL_LAST_FORMALITY')   || '',
-        context:    props.getProperty('DEEPL_LAST_CONTEXT')      || '',
-        glossaryId: props.getProperty('DEEPL_LAST_GLOSSARY_ID')  || '',
+        formality:          props.getProperty('DEEPL_LAST_FORMALITY')            || '',
+        context:            props.getProperty('DEEPL_LAST_CONTEXT')              || '',
+        glossaryId:         props.getProperty('DEEPL_LAST_GLOSSARY_ID')          || '',
+        styleId:            props.getProperty('DEEPL_LAST_STYLE_ID')             || '',
+        customInstructions: props.getProperty('DEEPL_LAST_CUSTOM_INSTRUCTIONS')  || '',
+        modelType:          props.getProperty('DEEPL_LAST_MODEL_TYPE')           || '',
     };
 }
 
@@ -223,12 +232,17 @@ function clearApiKey() {
  * @param {string|null} glossaryId Glossary ID, or null to omit.
  * @return {string} Translated text.
  */
-function callDeeplTranslateApi_(texts, sourceLang, targetLang, glossaryId, formality, context) {
+function callDeeplTranslateApi_(texts, sourceLang, targetLang, options) {
+    options = options || {};
     const body = { text: texts, target_lang: targetLang, show_billed_characters: true };
-    if (sourceLang) body.source_lang = sourceLang;
-    if (glossaryId) body.glossary_id = glossaryId;
-    if (formality) body.formality = formality;
-    if (context) body.context = context;
+    if (sourceLang)                                 body.source_lang          = sourceLang;
+    if (options.glossaryId)                         body.glossary_id          = options.glossaryId;
+    if (options.formality)                          body.formality            = options.formality;
+    if (options.context)                            body.context              = options.context;
+    if (options.styleId)                            body.style_id             = options.styleId;
+    if (options.customInstructions && options.customInstructions.length)
+                                                    body.custom_instructions  = options.customInstructions;
+    if (options.modelType)                          body.model_type           = options.modelType;
     const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
     const response = httpRequestWithRetries_('post', '/v2/translate', body, totalChars, true);
     checkResponse_(response);
