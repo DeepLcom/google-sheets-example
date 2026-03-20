@@ -51,6 +51,12 @@
     }
     select:focus, input[type="text"]:focus { border-color: #1a73e8; }
 
+    /* Language code override input — tight gap below the dropdown */
+    .lang-code-input {
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+
     textarea {
       width: 100%;
       padding: 7px 8px;
@@ -264,7 +270,7 @@
   <div id="main-screen">
 
     <label for="sourceLang">Source language</label>
-    <select id="sourceLang">
+    <select id="sourceLang" onchange="onLangChange('source')">
       <option value="">Auto-detect</option>
       <option value="BG">Bulgarian (BG)</option>
       <option value="CS">Czech (CS)</option>
@@ -280,6 +286,7 @@
       <option value="ID">Indonesian (ID)</option>
       <option value="IT">Italian (IT)</option>
       <option value="JA">Japanese (JA)</option>
+      <option value="KO">Korean (KO)</option>
       <option value="LT">Lithuanian (LT)</option>
       <option value="LV">Latvian (LV)</option>
       <option value="NL">Dutch (NL)</option>
@@ -291,11 +298,14 @@
       <option value="SL">Slovenian (SL)</option>
       <option value="SV">Swedish (SV)</option>
       <option value="TR">Turkish (TR)</option>
+      <option value="UK">Ukrainian (UK)</option>
       <option value="ZH">Chinese (ZH)</option>
+      <option value="__custom__">Other (enter code)…</option>
     </select>
+    <input type="text" id="sourceLangCode" class="lang-code-input" placeholder="Language code, e.g. ACE, ARG" style="display:none">
 
     <label for="targetLang">Target language</label>
-    <select id="targetLang" onchange="updateFormalityNote()">
+    <select id="targetLang" onchange="onLangChange('target')">
       <option value="BG">Bulgarian (BG)</option>
       <option value="CS">Czech (CS)</option>
       <option value="DA">Danish (DA)</option>
@@ -311,6 +321,7 @@
       <option value="ID">Indonesian (ID)</option>
       <option value="IT">Italian (IT)</option>
       <option value="JA">Japanese (JA)</option>
+      <option value="KO">Korean (KO)</option>
       <option value="LT">Lithuanian (LT)</option>
       <option value="LV">Latvian (LV)</option>
       <option value="NL">Dutch (NL)</option>
@@ -323,8 +334,11 @@
       <option value="SL">Slovenian (SL)</option>
       <option value="SV">Swedish (SV)</option>
       <option value="TR">Turkish (TR)</option>
+      <option value="UK">Ukrainian (UK)</option>
       <option value="ZH">Chinese (ZH)</option>
+      <option value="__custom__">Other (enter code)…</option>
     </select>
+    <input type="text" id="targetLangCode" class="lang-code-input" placeholder="Language code, e.g. ZH-HANS, ACE" style="display:none">
 
     <details id="options-section" open>
       <summary>Options</summary>
@@ -343,6 +357,19 @@
         <label for="context">Context (optional)</label>
         <input type="text" id="context" placeholder="e.g. Product description for a luxury watch">
 
+      </div>
+    </details>
+
+    <details id="customization-section">
+      <summary>Customization</summary>
+      <div class="section-body">
+
+        <label for="glossaryId">Glossary ID (optional)</label>
+        <input type="text" id="glossaryId" placeholder="e.g. def3a26b-3e84-…">
+
+        <label for="styleId">Style rule ID (optional)</label>
+        <input type="text" id="styleId" placeholder="e.g. def3a26b-3e84-…">
+
         <label for="customInstructions">Custom instructions (optional)</label>
         <textarea id="customInstructions" rows="3"
           placeholder="One instruction per line&#10;e.g. Use gender-neutral language&#10;e.g. Keep product names untranslated"></textarea>
@@ -355,12 +382,6 @@
       <summary>Advanced</summary>
       <div class="section-body">
 
-        <label for="glossaryId">Glossary ID (optional)</label>
-        <input type="text" id="glossaryId" placeholder="e.g. def3a26b-3e84-…">
-
-        <label for="styleId">Style rule ID (optional)</label>
-        <input type="text" id="styleId" placeholder="e.g. def3a26b-3e84-…">
-
         <label for="modelType">Model</label>
         <select id="modelType">
           <option value="">Default</option>
@@ -368,6 +389,11 @@
           <option value="prefer_quality_optimized">Prefer quality</option>
           <option value="latency_optimized">Speed optimized</option>
         </select>
+
+        <label for="extraOptions">Extra API options (optional)</label>
+        <textarea id="extraOptions" rows="3"
+          placeholder="One option per line&#10;e.g. preserve_formatting=true&#10;e.g. tag_handling=html"></textarea>
+        <span class="field-hint">Key=value pairs sent directly to the DeepL API.</span>
 
       </div>
     </details>
@@ -449,14 +475,15 @@
     google.script.run
       .withSuccessHandler(function(opts) {
         if (!opts) return;
-        document.getElementById('sourceLang').value         = opts.sourceLang;
-        document.getElementById('targetLang').value         = opts.targetLang;
+        restoreLang('sourceLang', 'sourceLangCode', opts.sourceLang);
+        restoreLang('targetLang', 'targetLangCode', opts.targetLang);
         document.getElementById('formality').value          = opts.formality;
         document.getElementById('context').value            = opts.context;
-        document.getElementById('customInstructions').value = opts.customInstructions;
         document.getElementById('glossaryId').value         = opts.glossaryId;
         document.getElementById('styleId').value            = opts.styleId;
+        document.getElementById('customInstructions').value = opts.customInstructions;
         document.getElementById('modelType').value          = opts.modelType;
+        document.getElementById('extraOptions').value       = opts.extraOptions;
         updateFormalityNote();
       })
       .getSavedOptions();
@@ -474,13 +501,45 @@
         .getApiKeySuffix();
     }
 
+    // ── Language helpers ─────────────────────────────────────────────────────
+
+    function onLangChange(which) {
+      var selectId = which === 'source' ? 'sourceLang'     : 'targetLang';
+      var inputId  = which === 'source' ? 'sourceLangCode' : 'targetLangCode';
+      var isCustom = document.getElementById(selectId).value === '__custom__';
+      document.getElementById(inputId).style.display = isCustom ? 'block' : 'none';
+      updateFormalityNote();
+    }
+
+    function getLangValue(selectId, inputId) {
+      var val = document.getElementById(selectId).value;
+      if (val === '__custom__') {
+        var code = document.getElementById(inputId).value.trim().toUpperCase();
+        return code || null;
+      }
+      return val || null;
+    }
+
+    // Restore a saved language value: use dropdown if the value is listed,
+    // otherwise fall back to the custom code input.
+    function restoreLang(selectId, inputId, value) {
+      if (!value) return;
+      var sel = document.getElementById(selectId);
+      sel.value = value;
+      if (sel.value !== value) {
+        sel.value = '__custom__';
+        document.getElementById(inputId).value = value;
+        document.getElementById(inputId).style.display = 'block';
+      }
+    }
+
     // ── Formality note ───────────────────────────────────────────────────────
 
     function updateFormalityNote() {
-      var lang = document.getElementById('targetLang').value;
+      var lang = getLangValue('targetLang', 'targetLangCode') || '';
       var note = document.getElementById('formality-note');
       var formality = document.getElementById('formality').value;
-      var supported = FORMALITY_LANGS.has(lang);
+      var supported = FORMALITY_LANGS.has(lang.toUpperCase());
       note.className = 'field-note' + (!supported && formality ? ' visible' : '');
     }
 
@@ -587,18 +646,19 @@
     // ── Translation ──────────────────────────────────────────────────────────
 
     function translateSelection() {
-      var sourceLang = document.getElementById('sourceLang').value;
-      var targetLang = document.getElementById('targetLang').value;
+      var sourceLang = getLangValue('sourceLang', 'sourceLangCode');
+      var targetLang = getLangValue('targetLang', 'targetLangCode');
       var formality  = document.getElementById('formality').value;
       var context    = document.getElementById('context').value.trim();
+      var glossaryId = document.getElementById('glossaryId').value.trim();
+      var styleId    = document.getElementById('styleId').value.trim();
       var customInstructions = document.getElementById('customInstructions').value
         .split('\n')
         .map(function(s) { return s.trim(); })
         .filter(function(s) { return s.length > 0; })
         .slice(0, 10);
-      var glossaryId = document.getElementById('glossaryId').value.trim();
-      var styleId    = document.getElementById('styleId').value.trim();
-      var modelType  = document.getElementById('modelType').value;
+      var modelType   = document.getElementById('modelType').value;
+      var extraOptions = document.getElementById('extraOptions').value.trim();
 
       var btn = document.getElementById('translateBtn');
       btn.disabled = true;
@@ -626,13 +686,14 @@
           btn.disabled = false;
           setStatus('translate-status', err.message || String(err), 'error');
         })
-        .translateSelectionFromSidebar(sourceLang || null, targetLang, {
+        .translateSelectionFromSidebar(sourceLang, targetLang, {
           formality:          formality          || null,
           context:            context            || null,
-          customInstructions: customInstructions.length ? customInstructions : null,
           glossaryId:         glossaryId         || null,
           styleId:            styleId            || null,
+          customInstructions: customInstructions.length ? customInstructions : null,
           modelType:          modelType          || null,
+          extraOptions:       extraOptions       || null,
         });
     }
 

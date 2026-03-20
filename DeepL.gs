@@ -113,6 +113,7 @@ function translateSelectionFromSidebar(sourceLang, targetLang, options) {
         'DEEPL_LAST_CUSTOM_INSTRUCTIONS': options.customInstructions
                                             ? options.customInstructions.join('\n') : '',
         'DEEPL_LAST_MODEL_TYPE':          options.modelType            || '',
+        'DEEPL_LAST_EXTRA_OPTIONS':       options.extraOptions         || '',
     });
 
     const cellsToTranslate = flatCells.filter(cell => {
@@ -172,6 +173,7 @@ function getSavedOptions() {
         styleId:            props.getProperty('DEEPL_LAST_STYLE_ID')             || '',
         customInstructions: props.getProperty('DEEPL_LAST_CUSTOM_INSTRUCTIONS')  || '',
         modelType:          props.getProperty('DEEPL_LAST_MODEL_TYPE')           || '',
+        extraOptions:       props.getProperty('DEEPL_LAST_EXTRA_OPTIONS')        || '',
     };
 }
 
@@ -243,6 +245,16 @@ function callDeeplTranslateApi_(texts, sourceLang, targetLang, options) {
     if (options.customInstructions && options.customInstructions.length)
                                                     body.custom_instructions  = options.customInstructions;
     if (options.modelType)                          body.model_type           = options.modelType;
+    if (options.extraOptions) {
+        for (const line of options.extraOptions.split('\n')) {
+            const idx = line.indexOf('=');
+            if (idx > 0) {
+                const key = line.slice(0, idx).trim();
+                const val = line.slice(idx + 1).trim();
+                if (key) body[key] = val;
+            }
+        }
+    }
     const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
     const response = httpRequestWithRetries_('post', '/v2/translate', body, totalChars, true);
     checkResponse_(response);
