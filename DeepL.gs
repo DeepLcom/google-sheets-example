@@ -105,7 +105,7 @@ function translateSelectionFromSidebar(sourceLang, targetLang, options) {
 
     PropertiesService.getScriptProperties().setProperties({
         'DEEPL_LAST_SOURCE_LANG':         sourceLang                   || '',
-        'DEEPL_LAST_TARGET_LANG':         targetLang,
+        'DEEPL_LAST_TARGET_LANG':         targetLang                   || '',
         'DEEPL_LAST_FORMALITY':           options.formality            || '',
         'DEEPL_LAST_CONTEXT':             options.context              || '',
         'DEEPL_LAST_GLOSSARY_ID':         options.glossaryId           || '',
