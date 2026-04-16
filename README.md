@@ -22,8 +22,7 @@ example project. If you have questions or feedback, please
 DeepL maintains a ready-to-use template Google Sheet with the script already
 embedded. No coding required.
 
-1. Open the [DeepL for Google Sheets template][template-sheet] *(link to be
-   added when the template is published)*.
+1. Open the [DeepL for Google Sheets template][template-sheet].
 2. Click **File → Make a copy**. Give it a name and save it to your Drive.
 3. Open your copy and click **DeepL → Open sidebar** in the toolbar.
 4. Enter your DeepL API key when prompted. The sidebar verifies the key and
@@ -108,9 +107,9 @@ We welcome feedback and contributions. Please [open an issue][issues] or
 
 [template-sheet]: https://docs.google.com/spreadsheets/d/1VVMDPYV7oL7ZM51RFUBDmmXnXRjYcMeiPx4gw5zAOgc/edit?usp=sharing
 
-[deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/feat/sidebar-ui-addon/DeepL.gs
+[deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
 
-[deepl-sidebar-html-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/feat/sidebar-ui-addon/DeepLSidebar.html
+[deepl-sidebar-html-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepLSidebar.html
 
 [formula-functions]: FORMULA_FUNCTIONS.md
 
