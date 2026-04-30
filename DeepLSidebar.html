@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Google Sans', Arial, sans-serif;
+      font-size: 13px;
+      color: #202124;
+      padding: 16px;
+      background: #fff;
+    }
+
+    h2 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+      margin-bottom: 12px;
+    }
+
+    p.intro {
+      font-size: 12px;
+      color: #5f6368;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #202124;
+      background: #fff;
+      margin-bottom: 12px;
+      outline: none;
+      appearance: none;
+    }
+    select:focus, input[type="text"]:focus { border-color: #1a73e8; }
+
+    /* Language code override input — tight gap below the dropdown */
+    .lang-code-input {
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #202124;
+      background: #fff;
+      margin-bottom: 4px;
+      outline: none;
+      resize: vertical;
+      min-height: 58px;
+      font-family: 'Google Sans', Arial, sans-serif;
+      line-height: 1.4;
+    }
+    textarea:focus { border-color: #1a73e8; }
+
+    /* Password field with show/hide toggle */
+    .password-row {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      background: #fff;
+      height: 34px;
+    }
+    .password-row:focus-within { border-color: #1a73e8; }
+    .password-row input {
+      flex: 1;
+      border: none;
+      margin-bottom: 0;
+      background: transparent;
+      outline: none;
+      height: 100%;
+      line-height: normal;
+      font-size: 13px;
+    }
+    .show-hide-btn {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    .field-note {
+      display: none;
+      font-size: 11px;
+      color: #80868b;
+      margin-top: -8px;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .field-note.visible { display: block; }
+
+    .field-hint {
+      display: block;
+      font-size: 11px;
+      color: #80868b;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 4px;
+    }
+    .btn-primary { background: #1a73e8; color: #fff; }
+    .btn-primary:hover { background: #1765cc; }
+    .btn-primary:disabled { background: #bdc1c6; cursor: default; }
+    .btn-secondary { background: #fff; color: #1a73e8; border: 1px solid #dadce0; margin-bottom: 8px; }
+    .btn-secondary:hover { background: #f8f9fa; }
+    .btn-secondary:disabled { color: #bdc1c6; border-color: #e8eaed; cursor: default; }
+
+    .status {
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 8px;
+      display: none;
+    }
+    .status.success { background: #e6f4ea; color: #137333; display: block; }
+    .status.error   { background: #fce8e6; color: #c5221f; display: block; }
+    .status.info    { background: #e8f0fe; color: #1a73e8; display: block; }
+
+    .divider { border: none; border-top: 1px solid #e8eaed; margin: 12px 0; }
+
+    /* Usage bar */
+    .usage-section { margin-bottom: 4px; }
+    .usage-bar-track {
+      width: 100%;
+      height: 6px;
+      background: #e8eaed;
+      border-radius: 3px;
+      margin: 6px 0 4px;
+      overflow: hidden;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .usage-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #e8eaed;
+      width: 100%;
+      animation: pulse 1.5s ease-in-out infinite;
+      transition: width 0.4s ease, background 0.3s ease;
+    }
+    .usage-bar-fill.loaded         { animation: none; background: #1a73e8; }
+    .usage-bar-fill.loaded.warn    { background: #f9ab00; }
+    .usage-bar-fill.loaded.danger  { background: #c5221f; }
+    .usage-numbers {
+      font-size: 11px;
+      color: #5f6368;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Collapsible sections */
+    details { margin-bottom: 4px; }
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      user-select: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::before {
+      content: '▸';
+      font-size: 10px;
+      transition: transform 0.15s;
+      display: inline-block;
+    }
+    details[open] summary::before { transform: rotate(90deg); }
+    .section-body { padding-top: 10px; }
+
+    .key-info {
+      font-size: 12px;
+      color: #5f6368;
+      margin-bottom: 10px;
+    }
+    .key-info code {
+      font-family: monospace;
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .link-danger {
+      background: none;
+      border: none;
+      color: #c5221f;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 0;
+      text-decoration: underline;
+      display: block;
+      margin-top: 4px;
+    }
+    .link-danger:hover { color: #a50e0e; }
+
+    .footer { margin-top: 16px; font-size: 11px; color: #80868b; text-align: center; }
+    .footer a { color: #80868b; }
+
+    #loading-screen { color: #80868b; font-size: 12px; padding: 4px 0; }
+    #setup-screen { display: none; }
+    #main-screen  { display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-screen">Loading…</div>
+
+  <!-- Shown when no API key is saved -->
+  <div id="setup-screen">
+    <h2>Connect your DeepL account</h2>
+    <p class="intro">
+      Enter your DeepL API key to get started. You can find it in your
+      <a href="https://www.deepl.com/account/summary" target="_blank">DeepL account</a>.
+    </p>
+    <label for="setup-key">API key</label>
+    <div class="password-row">
+      <input type="password" id="setup-key" placeholder="Paste your API key here">
+      <button class="show-hide-btn" onclick="toggleShow('setup-key', this)">Show</button>
+    </div>
+    <button class="btn btn-primary" id="setup-btn" onclick="saveKey('setup')">Save and continue</button>
+    <div id="setup-status" class="status"></div>
+  </div>
+
+  <!-- Shown once a key is saved -->
+  <div id="main-screen">
+
+    <label for="sourceLang">Source language</label>
+    <select id="sourceLang" onchange="onLangChange('source')">
+      <option value="">Auto-detect</option>
+      <option value="bg">Bulgarian (bg)</option>
+      <option value="cs">Czech (cs)</option>
+      <option value="da">Danish (da)</option>
+      <option value="de">German (de)</option>
+      <option value="el">Greek (el)</option>
+      <option value="en">English (en)</option>
+      <option value="es">Spanish (es)</option>
+      <option value="et">Estonian (et)</option>
+      <option value="fi">Finnish (fi)</option>
+      <option value="fr">French (fr)</option>
+      <option value="hu">Hungarian (hu)</option>
+      <option value="id">Indonesian (id)</option>
+      <option value="it">Italian (it)</option>
+      <option value="ja">Japanese (ja)</option>
+      <option value="ko">Korean (ko)</option>
+      <option value="lt">Lithuanian (lt)</option>
+      <option value="lv">Latvian (lv)</option>
+      <option value="nl">Dutch (nl)</option>
+      <option value="pl">Polish (pl)</option>
+      <option value="pt">Portuguese (pt)</option>
+      <option value="ro">Romanian (ro)</option>
+      <option value="ru">Russian (ru)</option>
+      <option value="sk">Slovak (sk)</option>
+      <option value="sl">Slovenian (sl)</option>
+      <option value="sv">Swedish (sv)</option>
+      <option value="tr">Turkish (tr)</option>
+      <option value="uk">Ukrainian (uk)</option>
+      <option value="zh">Chinese (zh)</option>
+      <option value="__custom__">Other (enter code)…</option>
+    </select>
+    <input type="text" id="sourceLangCode" class="lang-code-input" placeholder="BCP-47 code, e.g. ace, nb" style="display:none">
+
+    <label for="targetLang">Target language</label>
+    <select id="targetLang" onchange="onLangChange('target')">
+      <option value="bg">Bulgarian (bg)</option>
+      <option value="cs">Czech (cs)</option>
+      <option value="da">Danish (da)</option>
+      <option value="de">German (de)</option>
+      <option value="el">Greek (el)</option>
+      <option value="en-GB">English – British (en-GB)</option>
+      <option value="en-US" selected>English – American (en-US)</option>
+      <option value="es">Spanish (es)</option>
+      <option value="et">Estonian (et)</option>
+      <option value="fi">Finnish (fi)</option>
+      <option value="fr">French (fr)</option>
+      <option value="hu">Hungarian (hu)</option>
+      <option value="id">Indonesian (id)</option>
+      <option value="it">Italian (it)</option>
+      <option value="ja">Japanese (ja)</option>
+      <option value="ko">Korean (ko)</option>
+      <option value="lt">Lithuanian (lt)</option>
+      <option value="lv">Latvian (lv)</option>
+      <option value="nl">Dutch (nl)</option>
+      <option value="pl">Polish (pl)</option>
+      <option value="pt-BR">Portuguese – Brazilian (pt-BR)</option>
+      <option value="pt-PT">Portuguese – European (pt-PT)</option>
+      <option value="ro">Romanian (ro)</option>
+      <option value="ru">Russian (ru)</option>
+      <option value="sk">Slovak (sk)</option>
+      <option value="sl">Slovenian (sl)</option>
+      <option value="sv">Swedish (sv)</option>
+      <option value="tr">Turkish (tr)</option>
+      <option value="uk">Ukrainian (uk)</option>
+      <option value="zh">Chinese (zh)</option>
+      <option value="__custom__">Other (enter code)…</option>
+    </select>
+    <input type="text" id="targetLangCode" class="lang-code-input" placeholder="BCP-47 code, e.g. zh-Hans, nb" style="display:none">
+
+    <details id="options-section" open>
+      <summary>Options</summary>
+      <div class="section-body">
+
+        <label for="formality">Formality</label>
+        <select id="formality" onchange="updateFormalityNote()">
+          <option value="">Default</option>
+          <option value="prefer_more">Formal</option>
+          <option value="prefer_less">Informal</option>
+        </select>
+        <span id="formality-note" class="field-note">
+          Formality is not supported for this language and will be ignored.
+        </span>
+
+        <label for="context">Context (optional)</label>
+        <input type="text" id="context" placeholder="e.g. Product description for a luxury watch">
+
+      </div>
+    </details>
+
+    <details id="customization-section">
+      <summary>Customization</summary>
+      <div class="section-body">
+
+        <label for="glossaryId">Glossary ID (optional)</label>
+        <input type="text" id="glossaryId" placeholder="e.g. def3a26b-3e84-…">
+
+        <label for="styleId">Style rule ID (optional)</label>
+        <input type="text" id="styleId" placeholder="e.g. def3a26b-3e84-…">
+
+        <label for="customInstructions">Custom instructions (optional)</label>
+        <textarea id="customInstructions" rows="3"
+          placeholder="One instruction per line&#10;e.g. Use gender-neutral language&#10;e.g. Keep product names untranslated"></textarea>
+        <span class="field-hint">Up to 10 instructions, 300 characters each.</span>
+
+      </div>
+    </details>
+
+    <details id="advanced-section">
+      <summary>Advanced</summary>
+      <div class="section-body">
+
+        <label for="modelType">Model</label>
+        <select id="modelType">
+          <option value="">Default</option>
+          <option value="quality_optimized">Quality optimized</option>
+          <option value="prefer_quality_optimized">Prefer quality</option>
+          <option value="latency_optimized">Speed optimized</option>
+        </select>
+
+        <label for="extraOptions">Extra API options (optional)</label>
+        <textarea id="extraOptions" rows="3"
+          placeholder="key=value per line:&#10;preserve_formatting=true&#10;or as a JSON object:&#10;{&quot;preserve_formatting&quot;: true}"></textarea>
+        <span class="field-hint">Accepts key=value lines or a JSON object. Sent directly to the DeepL API.</span>
+
+      </div>
+    </details>
+
+    <button class="btn btn-primary" id="translateBtn" onclick="translateSelection()">
+      Translate selected cell(s)
+    </button>
+    <div id="translate-status" class="status"></div>
+
+    <hr class="divider">
+
+    <div class="usage-section">
+      <label>Usage this month</label>
+      <div class="usage-bar-track">
+        <div class="usage-bar-fill" id="usage-bar"></div>
+      </div>
+      <div class="usage-numbers">
+        <span id="usage-count">Loading…</span>
+        <span id="usage-limit"></span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <details id="settings-section">
+      <summary>Settings</summary>
+      <div class="section-body">
+        <div class="key-info">Active key: <code>···<span id="key-suffix">····</span></code></div>
+        <label for="update-key">Replace API key</label>
+        <div class="password-row">
+          <input type="password" id="update-key" placeholder="Paste new key">
+          <button class="show-hide-btn" onclick="toggleShow('update-key', this)">Show</button>
+        </div>
+        <button class="btn btn-secondary" id="update-btn" onclick="saveKey('update')">Save new key</button>
+        <div id="key-status" class="status"></div>
+        <button class="link-danger" onclick="clearKey()">Clear saved key…</button>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="footer">
+    <span id="version"></span> &mdash;
+    <a href="https://github.com/DeepLcom/google-sheets-example/blob/main/CHANGELOG.md"
+       target="_blank">changelog</a>
+  </div>
+
+  <script>
+    // Formality is only applied for these target language tags (matched case-insensitively).
+    var FORMALITY_LANGS = new Set(['de','fr','it','es','nl','pl','pt-br','pt-pt','ja','ru']);
+    var statusTimer = null;
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+
+    google.script.run
+      .withSuccessHandler(function(keyExists) {
+        document.getElementById('loading-screen').style.display = 'none';
+        if (keyExists) {
+          showMainScreen();
+        } else {
+          document.getElementById('setup-screen').style.display = 'block';
+        }
+      })
+      .withFailureHandler(function() {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('setup-screen').style.display = 'block';
+        setStatus('setup-status',
+          'Could not connect to the script. Open Extensions → Apps Script, ' +
+          'run any function to approve permissions, then reload this sidebar.',
+          'error');
+      })
+      .hasApiKey();
+
+    google.script.run
+      .withSuccessHandler(function(v) {
+        document.getElementById('version').textContent = 'v' + v;
+      })
+      .getScriptVersion();
+
+    google.script.run
+      .withSuccessHandler(function(opts) {
+        if (!opts) return;
+        restoreLang('sourceLang', 'sourceLangCode', opts.sourceLang);
+        restoreLang('targetLang', 'targetLangCode', opts.targetLang);
+        document.getElementById('formality').value          = opts.formality;
+        document.getElementById('context').value            = opts.context;
+        document.getElementById('glossaryId').value         = opts.glossaryId;
+        document.getElementById('styleId').value            = opts.styleId;
+        document.getElementById('customInstructions').value = opts.customInstructions;
+        document.getElementById('modelType').value          = opts.modelType;
+        document.getElementById('extraOptions').value       = opts.extraOptions;
+        updateFormalityNote();
+      })
+      .getSavedOptions();
+
+    // ── Screen transitions ───────────────────────────────────────────────────
+
+    function showMainScreen() {
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      refreshUsage();
+      google.script.run
+        .withSuccessHandler(function(suffix) {
+          if (suffix) document.getElementById('key-suffix').textContent = suffix;
+        })
+        .getApiKeySuffix();
+    }
+
+    // ── Language helpers ─────────────────────────────────────────────────────
+
+    function onLangChange(which) {
+      var selectId = which === 'source' ? 'sourceLang'     : 'targetLang';
+      var inputId  = which === 'source' ? 'sourceLangCode' : 'targetLangCode';
+      var isCustom = document.getElementById(selectId).value === '__custom__';
+      document.getElementById(inputId).style.display = isCustom ? 'block' : 'none';
+      updateFormalityNote();
+    }
+
+    function getLangValue(selectId, inputId) {
+      var val = document.getElementById(selectId).value;
+      if (val === '__custom__') {
+        return document.getElementById(inputId).value.trim() || null;
+      }
+      return val || null;
+    }
+
+    // Restore a saved language value: use the dropdown if the value is listed,
+    // otherwise fall back to the custom code input.
+    function restoreLang(selectId, inputId, value) {
+      if (!value) return;
+      var sel = document.getElementById(selectId);
+      sel.value = value;
+      if (sel.value !== value) {
+        sel.value = '__custom__';
+        document.getElementById(inputId).value = value;
+        document.getElementById(inputId).style.display = 'block';
+      }
+    }
+
+    // ── Formality note ───────────────────────────────────────────────────────
+
+    function updateFormalityNote() {
+      var lang = getLangValue('targetLang', 'targetLangCode') || '';
+      var note = document.getElementById('formality-note');
+      var formality = document.getElementById('formality').value;
+      var supported = FORMALITY_LANGS.has(lang.toLowerCase());
+      note.className = 'field-note' + (!supported && formality ? ' visible' : '');
+    }
+
+    // ── Usage bar ────────────────────────────────────────────────────────────
+
+    function refreshUsage() {
+      google.script.run
+        .withSuccessHandler(function(usage) {
+          renderUsage(usage.charCount, usage.charLimit);
+        })
+        .withFailureHandler(function() {
+          document.getElementById('usage-count').textContent = 'Could not load usage';
+          document.getElementById('usage-bar').className = 'usage-bar-fill loaded';
+          document.getElementById('usage-bar').style.width = '0%';
+        })
+        .getUsageForSidebar();
+    }
+
+    function renderUsage(count, limit) {
+      var pct = limit > 0 ? Math.round(count / limit * 100) : 0;
+      var bar = document.getElementById('usage-bar');
+      bar.style.width = Math.min(pct, 100) + '%';
+      bar.className = 'usage-bar-fill loaded' +
+        (pct >= 90 ? ' danger' : pct >= 75 ? ' warn' : '');
+      document.getElementById('usage-count').textContent =
+        formatNum(count) + ' chars (' + pct + '%)';
+      document.getElementById('usage-limit').textContent =
+        formatNum(limit) + ' limit';
+    }
+
+    function formatNum(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // ── API key management ───────────────────────────────────────────────────
+
+    function toggleShow(inputId, btn) {
+      var input = document.getElementById(inputId);
+      var showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+    }
+
+    function saveKey(context) {
+      var inputId  = context === 'setup' ? 'setup-key'    : 'update-key';
+      var statusId = context === 'setup' ? 'setup-status' : 'key-status';
+      var btnId    = context === 'setup' ? 'setup-btn'    : 'update-btn';
+      var key = document.getElementById(inputId).value.trim();
+      if (!key) { setStatus(statusId, 'API key must not be empty.', 'error'); return; }
+
+      document.getElementById(btnId).disabled = true;
+      setStatus(statusId, 'Saving and verifying…', 'info');
+
+      google.script.run
+        .withSuccessHandler(function() {
+          google.script.run
+            .withSuccessHandler(function(usage) {
+              document.getElementById(inputId).value = '';
+              document.getElementById(btnId).disabled = false;
+              if (context === 'setup') {
+                showMainScreen();
+                renderUsage(usage.charCount, usage.charLimit);
+              } else {
+                google.script.run
+                  .withSuccessHandler(function(suffix) {
+                    if (suffix) document.getElementById('key-suffix').textContent = suffix;
+                  })
+                  .getApiKeySuffix();
+                renderUsage(usage.charCount, usage.charLimit);
+                setStatus(statusId, 'API key updated and verified.', 'success');
+              }
+            })
+            .withFailureHandler(function(err) {
+              document.getElementById(btnId).disabled = false;
+              setStatus(statusId, 'Key saved but verification failed: ' + (err.message || err), 'error');
+              if (context === 'setup') showMainScreen();
+            })
+            .getUsageForSidebar();
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById(btnId).disabled = false;
+          setStatus(statusId, err.message || String(err), 'error');
+        })
+        .saveApiKey(key);
+    }
+
+    function clearKey() {
+      if (!confirm('Clear the saved API key? Translations will stop working until a new key is saved.')) return;
+      var btn = document.querySelector('#settings-section .link-danger');
+      btn.disabled = true;
+      google.script.run
+        .withSuccessHandler(function() {
+          document.getElementById('main-screen').style.display = 'none';
+          document.getElementById('setup-screen').style.display = 'block';
+          document.getElementById('setup-status').className = 'status';
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          setStatus('key-status', err.message || String(err), 'error');
+        })
+        .clearApiKey();
+    }
+
+    // ── Translation ──────────────────────────────────────────────────────────
+
+    function translateSelection() {
+      var sourceLang = getLangValue('sourceLang', 'sourceLangCode');
+      var targetLang = getLangValue('targetLang', 'targetLangCode');
+      var formality  = document.getElementById('formality').value;
+      var context    = document.getElementById('context').value.trim();
+      var glossaryId = document.getElementById('glossaryId').value.trim();
+      var styleId    = document.getElementById('styleId').value.trim();
+      var customInstructions = document.getElementById('customInstructions').value
+        .split('\n')
+        .map(function(s) { return s.trim(); })
+        .filter(function(s) { return s.length > 0; })
+        .slice(0, 10);
+      var modelType   = document.getElementById('modelType').value;
+      var extraOptions = document.getElementById('extraOptions').value.trim();
+
+      if (!targetLang) {
+        setStatus('translate-status', 'Please enter a target language code.', 'error');
+        return;
+      }
+
+      var btn = document.getElementById('translateBtn');
+      btn.disabled = true;
+      setStatus('translate-status', 'Translating…', 'info');
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          btn.disabled = false;
+          var n = result.translated;
+          if (n === 0 && result.failed === 0) {
+            setStatus('translate-status', 'No text found in selection.', 'info');
+          } else if (result.failed > 0) {
+            setStatus('translate-status',
+              'Translated ' + plural(n, 'cell') + '. ' +
+              plural(result.failed, 'cell') + ' failed: ' + result.error,
+              'error');
+          } else {
+            setStatus('translate-status',
+              'Translated ' + plural(n, 'cell') + ' (' + result.billedCharacters.toLocaleString() + ' billed characters).',
+              'success', true);
+          }
+          refreshUsage();
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          setStatus('translate-status', err.message || String(err), 'error');
+        })
+        .translateSelectionFromSidebar(sourceLang, targetLang, {
+          formality:          formality          || null,
+          context:            context            || null,
+          glossaryId:         glossaryId         || null,
+          styleId:            styleId            || null,
+          customInstructions: customInstructions.length ? customInstructions : null,
+          modelType:          modelType          || null,
+          extraOptions:       extraOptions       || null,
+        });
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function plural(n, word) {
+      return n + ' ' + word + (n === 1 ? '' : 's');
+    }
+
+    function setStatus(id, message, type, autoClose) {
+      clearTimeout(statusTimer);
+      var el = document.getElementById(id);
+      el.textContent = message;
+      el.className = 'status ' + type;
+      if (autoClose) {
+        statusTimer = setTimeout(function() {
+          el.className = 'status';
+        }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>

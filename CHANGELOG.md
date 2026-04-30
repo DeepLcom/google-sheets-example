@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-03-20
+### Added
+* Style rule ID field in the sidebar (Advanced section).
+* Custom instructions field — up to 10 instructions, one per line.
+* Model selection: Default, Quality optimized, Prefer quality, Speed optimized.
+* All new options are saved and restored automatically between sessions.
+
+### Changed
+* Sidebar options reorganised into collapsible sections: **Options**
+  (formality, context, custom instructions) and **Advanced** (glossary ID,
+  style rule ID, model), keeping the main translation controls uncluttered.
+* All translation options are now passed to the API as a single JSON object.
+
+## [0.3.0] - 2026-03-17
+### Added
+* **Sidebar UI for translation**. Select cells, set options, and click
+  **Translate** — results are written as static values and never
+  re-translated when the sheet is reopened.
+* Translation options: source/target language, formality
+  (Default / Formal / Informal), context hint, and glossary ID. All
+  options are saved and restored automatically between sessions.
+* API key management in the sidebar: enter, validate, and clear the key
+  without opening Apps Script settings.
+* Usage bar showing character consumption for the current billing period,
+  updated after each translation. Billed characters for the current
+  translation are shown after translation is complete.
+
+### Changed
+* The `DeepLTranslate()` and `DeepLUsage()` functions are maintained for
+  backwards compatibility, but disabled by default, see 
+  `FORMULA_FUNCTIONS.md` for instructions.
+
 ## [0.2.0] - 2025-09-01
 ### Changed
 * Renamed `freeze` variable to `disableTranslations`.
@@ -20,6 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 
-[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/DeepLcom/google-sheets-example/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/DeepLcom/google-sheets-example/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/DeepLcom/google-sheets-example/releases/tag/v0.1.0

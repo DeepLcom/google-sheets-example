@@ -22,6 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+/* Set to true to enable the DeepLTranslate() and DeepLUsage() formula functions.
+   Read FORMULA_FUNCTIONS.md for usage details and cost implications before enabling. */
+const enableFormulaFunctions = false;
+
 /* Change the line below to disable all translations. */
 const disableTranslations = false; // Set to true to stop translations.
 
@@ -30,10 +34,235 @@ const activateAutoDetect = false; // Set to true to enable auto-detection of re-
 
 /* You shouldn't need to modify the lines below here */
 
-const deeplApiKey = PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
-
 /* Version of this script from https://github.com/DeepLcom/google-sheet-example, included in logs. */
-const scriptVersion = "0.2.0";
+const scriptVersion = "0.4.0";
+
+/**
+ * Creates the DeepL menu when the spreadsheet is opened.
+ */
+function onOpen() {
+    SpreadsheetApp.getUi()
+        .createMenu('DeepL')
+        .addItem('Open sidebar', 'showSidebar')
+        .addSeparator()
+        .addItem('About (v' + scriptVersion + ')', 'showAbout_')
+        .addToUi();
+}
+
+/**
+ * Shows a dialog with the current script version and a link to the changelog.
+ */
+function showAbout_() {
+    const ui = SpreadsheetApp.getUi();
+    ui.alert(
+        'DeepL for Google Sheets',
+        'Version ' + scriptVersion + '\n\n' +
+        'To check for updates, visit:\n' +
+        'https://github.com/DeepLcom/google-sheets-example/blob/main/CHANGELOG.md',
+        ui.ButtonSet.OK
+    );
+}
+
+/**
+ * Returns the current script version. Called from the sidebar on load.
+ * @return {string}
+ */
+function getScriptVersion() {
+    return scriptVersion;
+}
+
+/**
+ * Opens the DeepL translation sidebar.
+ */
+function showSidebar() {
+    const html = HtmlService.createHtmlOutputFromFile('DeepLSidebar')
+        .setTitle('DeepL Translate')
+        .setWidth(300);
+    SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/**
+ * Translates the currently selected cells and writes results back as static values.
+ * Called from the sidebar via google.script.run.
+ *
+ * @param {string|null} sourceLang Source language code, or null for auto-detect.
+ * @param {string} targetLang Target language code.
+ * @param {{glossaryId, formality, context, styleId, customInstructions, modelType}} options
+ * @return {{translated: number, skipped: number, failed: number, error: string, billedCharacters: number}}
+ */
+function translateSelectionFromSidebar(sourceLang, targetLang, options) {
+    const range = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveRange();
+    if (!range) throw new Error('No cells selected.');
+
+    options = options || {};
+
+    const flatCells = [];
+    for (let r = 0; r < range.getNumRows(); r++) {
+        for (let c = 0; c < range.getNumColumns(); c++) {
+            flatCells.push(range.getCell(r + 1, c + 1));
+        }
+    }
+
+    PropertiesService.getScriptProperties().setProperties({
+        'DEEPL_LAST_SOURCE_LANG':         sourceLang                   || '',
+        'DEEPL_LAST_TARGET_LANG':         targetLang                   || '',
+        'DEEPL_LAST_FORMALITY':           options.formality            || '',
+        'DEEPL_LAST_CONTEXT':             options.context              || '',
+        'DEEPL_LAST_GLOSSARY_ID':         options.glossaryId           || '',
+        'DEEPL_LAST_STYLE_ID':            options.styleId              || '',
+        'DEEPL_LAST_CUSTOM_INSTRUCTIONS': options.customInstructions
+                                            ? options.customInstructions.join('\n') : '',
+        'DEEPL_LAST_MODEL_TYPE':          options.modelType            || '',
+        'DEEPL_LAST_EXTRA_OPTIONS':       options.extraOptions         || '',
+    });
+
+    const cellsToTranslate = flatCells.filter(cell => {
+        const text = cell.getDisplayValue();
+        return text && text.trim() !== '';
+    });
+    const skipped = flatCells.length - cellsToTranslate.length;
+
+    if (cellsToTranslate.length === 0) {
+        return { translated: 0, skipped, failed: 0, error: '', billedCharacters: 0 };
+    }
+
+    try {
+        const texts = cellsToTranslate.map(cell => cell.getDisplayValue());
+        const results = callDeeplTranslateApi_(texts, sourceLang, targetLang, options);
+        const billedCharacters = results.reduce((sum, r) => sum + r.billedCharacters, 0);
+        for (let i = 0; i < cellsToTranslate.length; i++) {
+            cellsToTranslate[i].setValue(results[i].text);
+        }
+        return { translated: cellsToTranslate.length, skipped, failed: 0, error: '', billedCharacters };
+    } catch (e) {
+        const lastError = e.message || String(e);
+        Logger.log(`DeepLcom/google-sheets-example/${scriptVersion}: translateSelectionFromSidebar error: ${lastError}`);
+        return { translated: 0, skipped, failed: cellsToTranslate.length, error: lastError, billedCharacters: 0 };
+    }
+}
+
+/**
+ * Returns API usage as a structured object for display in the sidebar.
+ * Called from the sidebar via google.script.run.
+ * @return {{charCount: number, charLimit: number}}
+ */
+function getUsageForSidebar() {
+    const response = httpRequestWithRetries_('get', '/v2/usage');
+    checkResponse_(response);
+    const obj = JSON.parse(response.getContentText());
+    if (obj.character_count === undefined || obj.character_limit === undefined)
+        throw new Error('Character usage not found in API response.');
+    return { charCount: obj.character_count, charLimit: obj.character_limit };
+}
+
+/**
+ * Returns all saved sidebar options, or null if none have been saved yet.
+ * Called from the sidebar on load.
+ * @return {{sourceLang, targetLang, formality, context, glossaryId, styleId, customInstructions, modelType}|null}
+ */
+function getSavedOptions() {
+    const props = PropertiesService.getScriptProperties();
+    const targetLang = props.getProperty('DEEPL_LAST_TARGET_LANG');
+    if (!targetLang) return null;
+    return {
+        sourceLang:         props.getProperty('DEEPL_LAST_SOURCE_LANG')          || '',
+        targetLang,
+        formality:          props.getProperty('DEEPL_LAST_FORMALITY')            || '',
+        context:            props.getProperty('DEEPL_LAST_CONTEXT')              || '',
+        glossaryId:         props.getProperty('DEEPL_LAST_GLOSSARY_ID')          || '',
+        styleId:            props.getProperty('DEEPL_LAST_STYLE_ID')             || '',
+        customInstructions: props.getProperty('DEEPL_LAST_CUSTOM_INSTRUCTIONS')  || '',
+        modelType:          props.getProperty('DEEPL_LAST_MODEL_TYPE')           || '',
+        extraOptions:       props.getProperty('DEEPL_LAST_EXTRA_OPTIONS')        || '',
+    };
+}
+
+/**
+ * Returns the last 4 characters of the saved API key, for display in the sidebar.
+ * @return {string|null}
+ */
+function getApiKeySuffix() {
+    const key = getApiKey_();
+    return key ? key.slice(-4) : null;
+}
+
+/**
+ * Returns whether an API key is currently saved in Script Properties.
+ * Called from the sidebar on load.
+ * @return {boolean}
+ */
+function hasApiKey() {
+    return !!PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
+}
+
+/**
+ * Saves the given API key to Script Properties and reloads the cached constant.
+ * Called from the sidebar via google.script.run.
+ * @param {string} key
+ */
+function saveApiKey(key) {
+    if (!key || !key.trim()) throw new Error('API key must not be empty.');
+    PropertiesService.getScriptProperties().setProperty('DEEPL_API_KEY', key.trim());
+}
+
+/**
+ * Deletes the saved API key from Script Properties.
+ * Called from the sidebar via google.script.run.
+ */
+function clearApiKey() {
+    PropertiesService.getScriptProperties().deleteProperty('DEEPL_API_KEY');
+}
+
+/**
+ * Calls the DeepL translate API for a single text string.
+ * Shared by the formula function and the sidebar/menu actions.
+ *
+ * @param {string} text The text to translate.
+ * @param {string|null} sourceLang Source language code, or null/falsy for auto-detect.
+ * @param {string} targetLang Target language code.
+ * @param {string|null} glossaryId Glossary ID, or null to omit.
+ * @return {string} Translated text.
+ */
+function callDeeplTranslateApi_(texts, sourceLang, targetLang, options) {
+    options = options || {};
+    const body = { text: texts, target_lang: targetLang, show_billed_characters: true };
+    if (sourceLang)                                 body.source_lang          = sourceLang;
+    if (options.glossaryId)                         body.glossary_id          = options.glossaryId;
+    if (options.formality)                          body.formality            = options.formality;
+    if (options.context)                            body.context              = options.context;
+    if (options.styleId)                            body.style_id             = options.styleId;
+    if (options.customInstructions && options.customInstructions.length)
+                                                    body.custom_instructions  = options.customInstructions;
+    if (options.modelType)                          body.model_type           = options.modelType;
+    if (options.extraOptions) {
+        const raw = options.extraOptions.trim();
+        if (raw.startsWith('{')) {
+            let parsed;
+            try { parsed = JSON.parse(raw); } catch (e) {
+                throw new Error('Extra options: invalid JSON — ' + e.message);
+            }
+            Object.assign(body, parsed);
+        } else {
+            for (const line of raw.split('\n')) {
+                const idx = line.indexOf('=');
+                if (idx > 0) {
+                    const key = line.slice(0, idx).trim();
+                    const val = line.slice(idx + 1).trim();
+                    if (key) body[key] = val;
+                }
+            }
+        }
+    }
+    const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+    const response = httpRequestWithRetries_('post', '/v2/translate', body, totalChars, true);
+    checkResponse_(response);
+    return JSON.parse(response.getContentText()).translations
+        .map(t => ({ text: t.text, billedCharacters: t.billed_characters || 0 }));
+}
+
+function getApiKey_() {
+    return PropertiesService.getScriptProperties().getProperty('DEEPL_API_KEY');
+}
 
 /**
  * Translates from one language to another using the DeepL Translation API.
@@ -56,6 +285,9 @@ function DeepLTranslate(input,
                         glossaryId,
                         options
 ) {
+    if (!enableFormulaFunctions) {
+        throw new Error('Formula functions are disabled. Set enableFormulaFunctions = true in DeepL.gs to enable them. See FORMULA_FUNCTIONS.md for details and cost implications.');
+    }
     if (input === undefined) {
         throw new Error("input field is undefined, please specify the text to translate.");
     } else if (typeof input === "number") {
@@ -118,6 +350,9 @@ function DeepLTranslate(input,
  * @customfunction
  */
 function DeepLUsage(type) {
+    if (!enableFormulaFunctions) {
+        throw new Error('Formula functions are disabled. Set enableFormulaFunctions = true in DeepL.gs to enable them. See FORMULA_FUNCTIONS.md for details and cost implications.');
+    }
     const response = httpRequestWithRetries_('get', '/v2/usage');
     checkResponse_(response);
     const responseObject = JSON.parse(response.getContentText());
@@ -201,8 +436,12 @@ function checkResponse_(response) {
 /**
  * Helper function to execute HTTP requests and retry failed requests.
  */
-function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount = 0) {
-    const baseUrl = deeplApiKey.endsWith(':fx')
+function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount = 0, useJson = false) {
+    const apiKey = getApiKey_();
+    if (!apiKey) {
+        throw new Error('DeepL API key not set. Use the DeepL sidebar to add your API key.');
+    }
+    const baseUrl = apiKey.endsWith(':fx')
         ? 'https://api-free.deepl.com'
         : 'https://api.deepl.com';
     const url = baseUrl + relativeUrl;
@@ -210,10 +449,17 @@ function httpRequestWithRetries_(method, relativeUrl, formData = null, charCount
         method: method,
         muteHttpExceptions: true,
         headers: {
-            'Authorization': 'DeepL-Auth-Key ' + deeplApiKey,
+            'Authorization': 'DeepL-Auth-Key ' + apiKey,
         },
     };
-    if (formData) params.payload = formData;
+    if (formData) {
+        if (useJson) {
+            params.contentType = 'application/json';
+            params.payload = JSON.stringify(formData);
+        } else {
+            params.payload = formData;
+        }
+    }
     let response = null;
     for (let numRetries = 0; numRetries < 5; numRetries++) {
         const lastRequestTime = Date.now();
