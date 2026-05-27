@@ -105,7 +105,7 @@ We welcome feedback and contributions. Please [open an issue][issues] or
 
 [api-languages]: https://www.deepl.com/docs-api/translating-text?utm_source=github&utm_content=google-sheets-plugin-readme&utm_medium=readme
 
-[template-sheet]: https://docs.google.com/spreadsheets/d/1VVMDPYV7oL7ZM51RFUBDmmXnXRjYcMeiPx4gw5zAOgc/edit?usp=sharing
+[template-sheet]: https://docs.google.com/spreadsheets/d/1VVMDPYV7oL7ZM51RFUBDmmXnXRjYcMeiPx4gw5zAOgc/copy
 
 [deepl-gs-raw]: https://raw.githubusercontent.com/DeepLcom/google-sheets-example/main/DeepL.gs
 
